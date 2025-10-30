@@ -1,21 +1,28 @@
-const express = require('express')
-const cors = require('cors')
+import express from 'express';
+import cors from 'cors';
+import { PrismaClient } from '@prisma/client';
 
-const app = express()
+const app = express();
+const prisma = new PrismaClient();
+const PORT = 3000; 
+
+app.use(express.json());
 
 const corsOptions = {
   origin: 'http://localhost:5173'
 };
-
 app.use(cors(corsOptions));
 
-app.use(express.json())
+// --- ROTAS DA API ---
 
-app.get('/api/v1/teste', (req, res) => {
-  res.json({ message: 'CORS está funcionando!' });
+// Rota de teste
+app.get('/api/teste', (req, res) => {
+  res.json({ message: 'A API do RH está funcionando!' });
 });
 
-const PORT = 3000;
+
+// --- FIM DAS ROTAS ---
+
 app.listen(PORT, () => {
-  console.log(`Servidor backend rodando na porta ${PORT}`);
+  console.log(`🚀 Servidor backend rodando na porta ${PORT}`);
 });
