@@ -1,0 +1,147 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL") // Puxa a URL de conexão do arquivo .env
+}
+
+//TABELAS
+
+// Tabela de Usuários (para login)
+model Usuario {
+  id         String   @id @default(uuid()) @db.Uuid
+  nome       String
+  email      String   @unique
+  senha_hash String
+  role       String   // 'ADMIN' ou 'TECNICO'
+  ativo      Boolean  @default(true)
+  criado_em  DateTime @default(now())
+
+  // Relacionamento: Um usuário pode registrar MUITAS entregas de EPI
+  entregas_feitas EntregasEPI[]
+
+  @@map("usuarios") // Mapeia o nome do modelo 'Usuario' para a tabela 'usuarios'
+}
+
+//Tabela de Cargos
+model Cargo {
+  id         String   @id @default(uuid()) @db.Uuid
+  nome_cargo String   @unique
+  descricao  String?
+  ativo      Boolean  @default(true)
+  criado_em  DateTime @default(now())
+
+  funcionarios Funcionario[]
+  
+  formacoes FormacoesEmCargo[]
+  quesitos  QuesitosEmCargo[]
+
+  @@map("cargos")
+}
+
+// Tabela de Funcionários
+model Funcionario {
+  id                String    @id @default(uuid()) @db.Uuid
+  nome_completo     String
+  cpf               String    @unique
+  data_admissao     DateTime  @db.Date
+  data_desligamento DateTime? @db.Date // [Nullable]
+  ativo             Boolean   @default(true)
+  criado_em         DateTime  @default(now())
+
+
+  cargo_id String    @db.Uuid
+  cargo    Cargo     @relation(fields: [cargo_id], references: [id], onDelete: Restrict) // Proíbe apagar cargo com funcionário
+
+  entregas_recebidas EntregasEPI[]
+
+  @@map("funcionarios")
+}
+
+//Tabela de EPIs
+model EPI {
+  id           String   @id @default(uuid()) @db.Uuid
+  nome_epi     String
+  ca_numero    String   @unique
+  validade_ca  DateTime @db.Date
+  descricao    String?
+  ativo        Boolean  @default(true)
+
+
+  entregas EntregasEPI[]
+
+  @@map("epis")
+}
+
+//Tabela de Entregas de EPI (Registro de Auditoria)
+model EntregasEPI {
+  id              String    @id @default(uuid()) @db.Uuid
+  data_entrega    DateTime  @default(now())
+  quantidade      Int       @default(1)
+  status          String    @default("ATIVO") // "ATIVO" ou "CANCELADO" (para o Estorno)
+  motivo_estorno  String?
+  data_estorno    DateTime?
+
+  //A entrega foi feita POR UM usuário
+  usuario_id String  @db.Uuid
+  usuario    Usuario @relation(fields: [usuario_id], references: [id])
+
+  //A entrega foi feita PARA UM funcionário
+  funcionario_id String      @db.Uuid
+  funcionario    Funcionario @relation(fields: [funcionario_id], references: [id])
+
+  // A entrega foi DE UM EPI
+  epi_id String @db.Uuid
+  epi    EPI    @relation(fields: [epi_id], references: [id])
+
+  @@map("entregas_epi")
+}
+
+//Tabela de Formações
+model Formacao {
+  id             String   @id @default(uuid()) @db.Uuid
+  nome_formacao  String
+  validade_meses Int?     // Quantos meses a formação dura?
+  descricao      String?
+
+  cargos FormacoesEmCargo[]
+
+  @@map("formacoes")
+}
+
+//Tabela de Quesitos (Catálogo)
+model Quesito {
+  id                String   @id @default(uuid()) @db.Uuid
+  descricao_quesito String   @unique
+
+  cargos QuesitosEmCargo[]
+
+  @@map("quesitos")
+}
+
+//Cargos <-> Formações
+model FormacoesEmCargo {
+  cargo_id    String @db.Uuid
+  formacao_id String @db.Uuid
+
+  // Relacionamentos
+  cargo    Cargo    @relation(fields: [cargo_id], references: [id])
+  formacao Formacao @relation(fields: [formacao_id], references: [id])
+
+  @@id([cargo_id, formacao_id])
+  @@map("cargos_formacoes")
+}
+
+//Cargos <-> Quesitos
+model QuesitosEmCargo {
+  cargo_id   String @db.Uuid
+  quesito_id String @db.Uuid
+
+  cargo    Cargo    @relation(fields: [cargo_id], references: [id])
+  quesito  Quesito  @relation(fields: [quesito_id], references: [id])
+
+  @@id([cargo_id, quesito_id]) // Define a chave primária composta
+  @@map("cargos_quesitos")
+}
