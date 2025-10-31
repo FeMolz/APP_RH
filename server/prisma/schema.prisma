@@ -47,6 +47,7 @@ model Funcionario {
   nome_completo     String
   cpf               String    @unique
   data_admissao     DateTime  @db.Date
+  data_contabilidade DateTime @db.Date
   data_desligamento DateTime? @db.Date // [Nullable]
   ativo             Boolean   @default(true)
   criado_em         DateTime  @default(now())
