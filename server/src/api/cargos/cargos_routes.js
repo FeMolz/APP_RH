@@ -1,40 +1,40 @@
 import { Router } from 'express';
 import { cargosController } from './cargos_controller.js';
-//import { isAuthenticated } from '../../middlewares/isAuthenticated.js';
-//import { isAdmin } from '../../middlewares/isAdmin.js';
+import { isAuthenticated } from '../../middlewares/isAuthenticated.js';
+import { isAdmin } from '../../middlewares/isAdmin.js';
 
 const router = Router();
 
 router.get(
   '/', 
-  //isAuthenticated, 
+  isAuthenticated, 
   cargosController.listarTodosAtivos
 );
 
 router.get(
   '/:id', 
-  //isAuthenticated, 
+  isAuthenticated, 
   cargosController.buscarPorId
 );
 
 router.post(
   '/', 
-  //isAuthenticated, 
-  //isAdmin, 
+  isAuthenticated, 
+  isAdmin, 
   cargosController.criarCargo
 );
 
 router.put(
   '/:id', 
-  //isAuthenticated, 
-  //isAdmin, 
+  isAuthenticated, 
+  isAdmin, 
   cargosController.atualizarCargo
 );
 
 router.delete(
   '/:id', 
-  //isAuthenticated, 
-  //isAdmin, 
+  isAuthenticated, 
+  isAdmin, 
   cargosController.inativarCargo
 );
 
