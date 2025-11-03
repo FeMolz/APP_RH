@@ -43,14 +43,14 @@ model Cargo {
 
 // Tabela de Funcionários
 model Funcionario {
-  id                String    @id @default(uuid()) @db.Uuid
-  nome_completo     String
-  cpf               String    @unique
-  data_admissao     DateTime  @db.Date
+  id                 String    @id @default(uuid()) @db.Uuid
+  nome_completo      String
+  cpf                String    @unique
+  data_admissao      DateTime  @db.Date
   data_contabilidade DateTime? @db.Date
-  data_desligamento DateTime? @db.Date // [Nullable]
-  ativo             Boolean   @default(true)
-  criado_em         DateTime  @default(now())
+  data_desligamento  DateTime? @db.Date // [Nullable]
+  ativo              Boolean   @default(true)
+  criado_em          DateTime  @default(now())
 
 
   cargo_id String    @db.Uuid
