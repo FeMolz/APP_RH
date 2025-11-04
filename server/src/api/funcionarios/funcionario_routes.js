@@ -19,4 +19,6 @@ router.put('/:id', funcionarioController.atualizarFuncionario);
 // Desliga um funcionário (Soft Delete)
 router.delete('/:id', funcionarioController.desligarFuncionario);
 
+router.post('/:id/formacao', funcionarioController.adicionarFormacao);
+
 export { router as funcionarioRoutes };

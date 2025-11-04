@@ -2,6 +2,7 @@ import { funcionarioService } from './funcionario_service.js';
 
 export const funcionarioController = {
 
+  // POST /funcionarios
   async criarFuncionario(req, res, next) {
     try {
       const novoFuncionario = await funcionarioService.criar(req.body);
@@ -17,6 +18,7 @@ export const funcionarioController = {
     }
   },
 
+  // GET /funcionarios
   async listarTodosAtivos(req, res, next) {
     try {
       const funcionarios = await funcionarioService.listarAtivos();
@@ -26,6 +28,7 @@ export const funcionarioController = {
     }
   },
 
+  // GET /funcionarios/:id
   async buscarPorId(req, res, next) {
     try {
       const { id } = req.params;
@@ -40,6 +43,7 @@ export const funcionarioController = {
     }
   },
 
+  // PUT /funcionarios/:id
   async atualizarFuncionario(req, res, next) {
     try {
       const { id } = req.params;
@@ -47,7 +51,6 @@ export const funcionarioController = {
       const funcionarioAtualizado = await funcionarioService.atualizar(id, dados);
       res.status(200).json(funcionarioAtualizado);
     } catch (error) {
-      // Pode dar erro de CPF duplicado na atualização
       if (error.code === 'P2002' && error.meta?.target?.includes('cpf')) {
         return res.status(409).json({ message: 'Este CPF já pertence a outro funcionário.' });
       }
@@ -55,11 +58,26 @@ export const funcionarioController = {
     }
   },
 
+  // DELETE /funcionarios/:id
   async desligarFuncionario(req, res, next) {
     try {
       const { id } = req.params;
       await funcionarioService.desligar(id);
       res.status(204).send();
+    } catch (error) {
+      next(error);
+    }
+  },
+
+
+  // POST /funcionarios/:id/formacao
+  async adicionarFormacao(req, res, next) {
+    try {
+      const { id: funcionario_id } = req.params;
+      const dadosFormacao = req.body;
+      
+      const novaFormacao = await funcionarioService.adicionarFormacao(funcionario_id, dadosFormacao);
+      res.status(201).json(novaFormacao);
     } catch (error) {
       next(error);
     }

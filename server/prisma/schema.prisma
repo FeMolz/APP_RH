@@ -4,7 +4,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL") // Puxa a URL de conexão do arquivo .env
+  url      = env("DATABASE_URL") 
 }
 
 //TABELAS
@@ -19,10 +19,9 @@ model Usuario {
   ativo      Boolean  @default(true)
   criado_em  DateTime @default(now())
 
-  // Relacionamento: Um usuário pode registrar MUITAS entregas de EPI
   entregas_feitas EntregasEPI[]
 
-  @@map("usuarios") // Mapeia o nome do modelo 'Usuario' para a tabela 'usuarios'
+  @@map("usuarios") 
 }
 
 //Tabela de Cargos
@@ -34,8 +33,6 @@ model Cargo {
   criado_em  DateTime @default(now())
 
   funcionarios Funcionario[]
-  
-  formacoes FormacoesEmCargo[]
   quesitos  QuesitosEmCargo[]
 
   @@map("cargos")
@@ -54,7 +51,8 @@ model Funcionario {
 
 
   cargo_id String    @db.Uuid
-  cargo    Cargo     @relation(fields: [cargo_id], references: [id], onDelete: Restrict) // Proíbe apagar cargo com funcionário
+  cargo    Cargo     @relation(fields: [cargo_id], references: [id], onDelete: Restrict) 
+  formacoes Formacao[]
 
   entregas_recebidas EntregasEPI[]
 
@@ -81,7 +79,7 @@ model EntregasEPI {
   id              String    @id @default(uuid()) @db.Uuid
   data_entrega    DateTime  @default(now())
   quantidade      Int       @default(1)
-  status          String    @default("ATIVO") // "ATIVO" ou "CANCELADO" (para o Estorno)
+  status          String    @default("ATIVO") 
   motivo_estorno  String?
   data_estorno    DateTime?
 
@@ -102,14 +100,19 @@ model EntregasEPI {
 
 //Tabela de Formações
 model Formacao {
-  id             String   @id @default(uuid()) @db.Uuid
-  nome_formacao  String
-  validade_meses Int?     // Quantos meses a formação dura?
+  id             String    @id @default(uuid()) @db.Uuid
+  nome_formacao  String    
+  instituicao    String    
+  nivel          String    
+  data_inicio    DateTime  @db.Date
+  data_conclusao DateTime  @db.Date
   descricao      String?
 
-  cargos FormacoesEmCargo[]
+  funcionario_id String      @db.Uuid
+  funcionario    Funcionario @relation(fields: [funcionario_id], references: [id])
 
   @@map("formacoes")
+
 }
 
 //Tabela de Quesitos (Catálogo)
@@ -120,19 +123,6 @@ model Quesito {
   cargos QuesitosEmCargo[]
 
   @@map("quesitos")
-}
-
-//Cargos <-> Formações
-model FormacoesEmCargo {
-  cargo_id    String @db.Uuid
-  formacao_id String @db.Uuid
-
-  // Relacionamentos
-  cargo    Cargo    @relation(fields: [cargo_id], references: [id])
-  formacao Formacao @relation(fields: [formacao_id], references: [id])
-
-  @@id([cargo_id, formacao_id])
-  @@map("cargos_formacoes")
 }
 
 //Cargos <-> Quesitos

@@ -36,6 +36,7 @@ export const funcionarioService = {
       where: { id: id },
       include: {
         cargo: true,
+        formacoes: true,
       },
     });
   },
@@ -64,4 +65,21 @@ export const funcionarioService = {
       },
     });
   },
+
+  adicionarFormacao: async (funcionario_id, dados) => {
+    const { nome_formacao, instituicao, nivel, data_inicio, data_conclusao, descricao } = dados;
+
+    return await prisma.formacao.create({
+      data: {
+        nome_formacao,
+        instituicao,
+        nivel,
+        data_inicio: new Date(data_inicio),
+        data_conclusao: new Date(data_conclusao),
+        descricao,
+        funcionario_id: funcionario_id,
+      },
+    });
+  },
+
 };
