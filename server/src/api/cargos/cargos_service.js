@@ -43,4 +43,24 @@ export const cargosService = {
       data: { ativo: false },
     });
   },
+
+  adicionarQuesito: async (cargo_id, quesito_id) => {
+    return await prisma.quesitosEmCargo.create({
+      data: {
+        cargo_id: cargo_id,
+        quesito_id: quesito_id,
+      },
+    });
+  },
+
+  removerQuesito: async (cargo_id, quesito_id) => {
+    return await prisma.quesitosEmCargo.delete({
+      where: {
+        cargo_id_quesito_id: {
+          cargo_id: cargo_id,
+          quesito_id: quesito_id,
+        },
+      },
+    });
+  },
 };

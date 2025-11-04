@@ -38,4 +38,17 @@ router.delete(
   cargosController.inativarCargo
 );
 
+router.post(
+  '/:id/quesito',
+  isAuthenticated, 
+  isAdmin, 
+  cargosController.handleAdicionarQuesito
+);
+
+router.delete(
+  '/:id/quesito/:quesitoId',
+  isAuthenticated, 
+  isAdmin, 
+  cargosController.handleRemoverQuesito
+);
 export { router as cargosRoutes };

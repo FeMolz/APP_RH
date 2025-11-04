@@ -54,4 +54,40 @@ export const cargosController = {
       next(error);
     }
   },
+
+  async handleAdicionarQuesito(req, res, next) {
+    try {
+      const { id: cargo_id } = req.params; 
+      const { quesito_id } = req.body; 
+
+      if (!quesito_id) {
+        return res.status(400).json({ message: 'O campo quesito_id é obrigatório.' });
+      }
+      
+      await cargosService.adicionarQuesito(cargo_id, quesito_id);
+      res.status(201).json({ message: 'Quesito vinculado com sucesso.' });
+    } catch (error) {
+      if (error.code === 'P2003') {
+        return res.status(404).json({ message: 'Cargo ou Quesito não encontrado.' });
+      }
+      if (error.code === 'P2002') {
+        return res.status(409).json({ message: 'Este quesito já está vinculado a este cargo.' });
+      }
+      next(error);
+    }
+  },
+
+  async handleRemoverQuesito(req, res, next) {
+    try {
+      const { id: cargo_id, quesitoId: quesito_id } = req.params;
+      
+      await cargosService.removerQuesito(cargo_id, quesito_id);
+      res.status(204).send();
+    } catch (error) {
+      if (error.code === 'P2025') {
+        return res.status(404).json({ message: 'Vínculo entre cargo e quesito não encontrado.' });
+      }
+      next(error);
+    }
+  },
 };
