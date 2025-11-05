@@ -41,9 +41,13 @@
 }
 
 .link .icon {
-    width: 28px;
+    width: 18px;
+    height: 18px;
     text-align: center;
-    font-size: 1.1rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
 }
 
 .link.active {
@@ -59,27 +63,12 @@
 }
 
 /* Collapsed state */
-.primary_sidebar.collapsed {
-    width: 72px;
-}
 
 .primary_sidebar .sidebar_header {
     display: flex;
     align-items: center;
     gap: 8px;
-    justify-content: flex-start;
-}
-
-.collapse_btn {
-    background: transparent;
-    border: none;
-    color: rgba(255,255,255,0.9);
-    padding: 6px;
-    display: inline-flex;
-    align-items: center;
     justify-content: center;
-    cursor: pointer;
-    font-size: 1.15rem;
 }
 
 .brand {
@@ -87,32 +76,17 @@
     align-items: center;
 }
 
-.brand img {
-    height: 32px;
-    width: auto;
-    display: block;
-}
-
-
-.primary_sidebar.collapsed .title {
-    display: none;
-}
-
 .primary_sidebar .icon {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.1rem;
+    width: 22px;
+    height: 22px;
+    font-size: 18px;
 }
 
-/* small screens: overlay / full width when opened (optional) */
-@media (max-width: 720px) {
-    .primary_sidebar {
-        position: fixed;
-        z-index: 50;
-        left: 0;
-        top: 0;
-        height: 100vh;
-        transform: translateX(0);
-    }
+.icon svg {
+    width: 18px;
+    height: 18px;
 }
+
