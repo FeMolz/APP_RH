@@ -1,0 +1,26 @@
+/* Global application styles and font */
+@charset "utf-8";
+
+/* Apply Poppins as the primary UI font */
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  font-family: 'Poppins', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: #f7f8fa;
+  color: #111827;
+}
+
+/* Form controls inherit the UI font */
+input, button, select, textarea {
+  font-family: inherit;
+}
+
+/* Utility: make body use the full width/height and avoid overflow layout shifts */
+main {
+  display: block;
+}
