@@ -2,6 +2,19 @@ import { funcionarioService } from './funcionario_service.js';
 
 export const funcionarioController = {
 
+  // GET /funcionarios/birthdays
+  async listarAniversariantes(req, res, next) {
+    try {
+      console.log('Requisição recebida em /funcionarios/birthdays');
+      const aniversariantes = await funcionarioService.listarAniversariantes();
+      console.log('Aniversariantes encontrados:', aniversariantes);
+      res.status(200).json(aniversariantes);
+    } catch (error) {
+      console.error('Erro ao listar aniversariantes:', error);
+      next(error);
+    }
+  },
+
   // POST /funcionarios
   async criarFuncionario(req, res, next) {
     try {

@@ -1,11 +1,13 @@
 import "./App.css";
-import PrimarySidebar from "./components/PrimarySidebar";
+import AppRoutes from "./routes/AppRoutes";
 
 function App() {
-    return <div className="App">
-        <PrimarySidebar />
-    </div>
+    return (
+        <div className="App">
+            <AppRoutes />
+        </div>
+    );
 }
 
-export default App
+export default App;
 

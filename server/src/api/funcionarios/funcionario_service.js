@@ -4,7 +4,7 @@ const prisma = new PrismaClient();
 export const funcionarioService = {
 
   criar: async (dados) => {
-    const { nome_completo, cpf, data_admissao, cargo_id, data_contabilidade } = dados;
+    const { nome_completo, cpf, data_admissao, cargo_id, data_contabilidade, data_nascimento } = dados;
     return await prisma.funcionario.create({
       data: {
         nome_completo,
@@ -12,6 +12,7 @@ export const funcionarioService = {
         data_admissao: new Date(data_admissao),
         cargo_id,
         data_contabilidade: data_contabilidade ? new Date(data_contabilidade) : undefined,
+        data_nascimento: data_nascimento ? new Date(data_nascimento) : undefined,
       },
     });
   },
@@ -20,7 +21,6 @@ export const funcionarioService = {
     return await prisma.funcionario.findMany({
       where: { ativo: true },
       include: {
-
         cargo: {
           select: {
             nome_cargo: true
@@ -28,6 +28,30 @@ export const funcionarioService = {
         }
       },
       orderBy: { nome_completo: 'asc' },
+    });
+  },
+
+  listarAniversariantes: async () => {
+    const currentDate = new Date();
+    const currentMonth = currentDate.getMonth() + 1; // JavaScript months são 0-based
+
+    return await prisma.funcionario.findMany({
+      where: {
+        ativo: true,
+        data_nascimento: {
+          not: null
+        }
+      },
+      select: {
+        id: true,
+        nome_completo: true,
+        data_nascimento: true
+      },
+      orderBy: [
+        {
+          data_nascimento: 'asc'
+        }
+      ]
     });
   },
 
@@ -42,7 +66,7 @@ export const funcionarioService = {
   },
 
   atualizar: async (id, dados) => {
-    const { nome_completo, cpf, data_admissao, cargo_id, data_contabilidade } = dados;
+    const { nome_completo, cpf, data_admissao, cargo_id, data_contabilidade, data_nascimento } = dados;
 
     return await prisma.funcionario.update({
       where: { id: id },
@@ -52,6 +76,7 @@ export const funcionarioService = {
         data_admissao: data_admissao ? new Date(data_admissao) : undefined,
         cargo_id,
         data_contabilidade: data_contabilidade ? new Date(data_contabilidade) : undefined,
+        data_nascimento: data_nascimento ? new Date(data_nascimento) : undefined,
       },
     });
   },

@@ -62,31 +62,4 @@
     text-overflow: ellipsis;
 }
 
-/* Collapsed state */
-
-.primary_sidebar .sidebar_header {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    justify-content: center;
-}
-
-.brand {
-    display: flex;
-    align-items: center;
-}
-
-.primary_sidebar .icon {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 22px;
-    height: 22px;
-    font-size: 18px;
-}
-
-.icon svg {
-    width: 18px;
-    height: 18px;
-}
 

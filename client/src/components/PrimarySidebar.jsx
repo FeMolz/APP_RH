@@ -7,7 +7,7 @@ export default function PrimarySidebar() {
     return (
         <aside className="primary_sidebar">
             <div className="sidebar_header">
-                <div className="brand">APP RH</div>
+                <div className="brand">CVF Incorporadora</div>
             </div>
 
             <nav className="sidebar_nav" aria-label="Main navigation">

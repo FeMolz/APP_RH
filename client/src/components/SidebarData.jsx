@@ -4,7 +4,7 @@ import { IoDocumentText } from "react-icons/io5";
 import { BsClipboard2PulseFill } from "react-icons/bs";
 
 const SidebarData = [
-  { title: 'Dashboard', path: '/dashboard', icon: FaHome },  
+  { title: 'Dashboard', path: '/home', icon: FaHome },  
   { title: 'Cadastros', path: '/cadastros', icon: BsFillPersonPlusFill },  
   { title: 'Entrega EPIs', path: '/entregas', icon: FaTools },
   { title: 'Avaliação', path: '/avaliacao', icon: BsClipboard2PulseFill },

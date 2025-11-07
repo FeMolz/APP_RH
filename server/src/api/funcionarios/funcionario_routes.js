@@ -5,6 +5,10 @@ import { isAdmin } from '../../middlewares/isAdmin.js';
 
 const router = Router();
 
+// Rota pública para aniversariantes
+router.get('/birthdays', funcionarioController.listarAniversariantes);
+
+// Rotas protegidas
 router.use(isAuthenticated);
 router.use(isAdmin);
 

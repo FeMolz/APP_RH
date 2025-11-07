@@ -12,7 +12,7 @@ router.use('/auth', authRoutes);
 router.use('/cargos', cargosRoutes);
 router.use('/funcionarios', funcionarioRoutes);
 router.use('/epis', epiRoutes);
-router.use('/formcacoes', formacaoRoutes);
+router.use('/formacoes', formacaoRoutes);
 router.use('/quesitos', quesitoRoutes);
 
 export default router;

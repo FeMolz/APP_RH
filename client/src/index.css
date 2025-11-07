@@ -1,9 +1,14 @@
-/* Global application styles and font */
 @charset "utf-8";
 
-/* Apply Poppins as the primary UI font */
 html, body, #root {
   height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+#root {
+  display: flex;
+  width: 100%;
 }
 
 body {
@@ -15,12 +20,10 @@ body {
   color: #111827;
 }
 
-/* Form controls inherit the UI font */
 input, button, select, textarea {
   font-family: inherit;
 }
 
-/* Utility: make body use the full width/height and avoid overflow layout shifts */
 main {
   display: block;
 }

@@ -43,6 +43,7 @@ model Funcionario {
   id                 String    @id @default(uuid()) @db.Uuid
   nome_completo      String
   cpf                String    @unique
+  data_nascimento    DateTime? @db.Date
   data_admissao      DateTime  @db.Date
   data_contabilidade DateTime? @db.Date
   data_desligamento  DateTime? @db.Date // [Nullable]

@@ -5,15 +5,16 @@ import apiRoutes from './api/index.js';
 
 const app = express();
 const prisma = new PrismaClient();
-const PORT = 3000; 
+const PORT = 3001; 
 
 app.use(express.json());
-app.use('/api', apiRoutes);
 
 const corsOptions = {
   origin: 'http://localhost:5173'
 };
 app.use(cors(corsOptions));
+
+app.use('/api', apiRoutes);
 
 // --- ROTAS DA API ---
 
