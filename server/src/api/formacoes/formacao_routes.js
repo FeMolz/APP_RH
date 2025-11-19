@@ -12,4 +12,25 @@ router.delete(
   formacaoController.handleDeletar
 );
 
+router.post(
+  '/',
+  isAuthenticated,
+  isAdmin,
+  formacaoController.handleCreate
+);
+
+router.get(
+  '/',
+  isAuthenticated,
+  isAdmin,
+  formacaoController.handleListar
+);
+
+router.put(
+  '/:id',
+  isAuthenticated,
+  isAdmin,
+  formacaoController.handleAtualizar
+);
+
 export { router as formacaoRoutes };

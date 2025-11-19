@@ -34,7 +34,8 @@ export const funcionarioController = {
   // GET /funcionarios
   async listarTodosAtivos(req, res, next) {
     try {
-      const funcionarios = await funcionarioService.listarAtivos();
+      const filtros = req.query;
+      const funcionarios = await funcionarioService.listarAtivos(filtros);
       res.status(200).json(funcionarios);
     } catch (error) {
       next(error);
@@ -46,7 +47,7 @@ export const funcionarioController = {
     try {
       const { id } = req.params;
       const funcionario = await funcionarioService.buscarPorId(id);
-      
+
       if (!funcionario) {
         return res.status(404).json({ message: 'Funcionário não encontrado.' });
       }
@@ -88,7 +89,7 @@ export const funcionarioController = {
     try {
       const { id: funcionario_id } = req.params;
       const dadosFormacao = req.body;
-      
+
       const novaFormacao = await funcionarioService.adicionarFormacao(funcionario_id, dadosFormacao);
       res.status(201).json(novaFormacao);
     } catch (error) {

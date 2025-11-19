@@ -48,6 +48,7 @@ model Funcionario {
   data_contabilidade DateTime? @db.Date
   data_desligamento  DateTime? @db.Date // [Nullable]
   ativo              Boolean   @default(true)
+  empresa            String    // 'CVF Incorporadora', 'Ligasul', 'Vivant'
   criado_em          DateTime  @default(now())
 
 

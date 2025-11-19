@@ -4,7 +4,7 @@ const prisma = new PrismaClient();
 export const funcionarioService = {
 
   criar: async (dados) => {
-    const { nome_completo, cpf, data_admissao, cargo_id, data_contabilidade, data_nascimento } = dados;
+    const { nome_completo, cpf, data_admissao, cargo_id, data_contabilidade, data_nascimento, empresa } = dados;
     return await prisma.funcionario.create({
       data: {
         nome_completo,
@@ -13,19 +13,31 @@ export const funcionarioService = {
         cargo_id,
         data_contabilidade: data_contabilidade ? new Date(data_contabilidade) : undefined,
         data_nascimento: data_nascimento ? new Date(data_nascimento) : undefined,
+        empresa,
       },
     });
   },
 
-  listarAtivos: async () => {
+  listarAtivos: async (filtros = {}) => {
+    const where = { ativo: true };
+
+    if (filtros.empresa) {
+      where.empresa = filtros.empresa;
+    }
+
+    if (filtros.cargo_id) {
+      where.cargo_id = filtros.cargo_id;
+    }
+
     return await prisma.funcionario.findMany({
-      where: { ativo: true },
+      where,
       include: {
         cargo: {
           select: {
             nome_cargo: true
           }
-        }
+        },
+        formacoes: true
       },
       orderBy: { nome_completo: 'asc' },
     });
@@ -66,7 +78,7 @@ export const funcionarioService = {
   },
 
   atualizar: async (id, dados) => {
-    const { nome_completo, cpf, data_admissao, cargo_id, data_contabilidade, data_nascimento } = dados;
+    const { nome_completo, cpf, data_admissao, cargo_id, data_contabilidade, data_nascimento, empresa } = dados;
 
     return await prisma.funcionario.update({
       where: { id: id },
@@ -77,6 +89,7 @@ export const funcionarioService = {
         cargo_id,
         data_contabilidade: data_contabilidade ? new Date(data_contabilidade) : undefined,
         data_nascimento: data_nascimento ? new Date(data_nascimento) : undefined,
+        empresa,
       },
     });
   },
