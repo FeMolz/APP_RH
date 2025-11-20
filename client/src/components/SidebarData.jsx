@@ -1,4 +1,4 @@
-import { FaGraduationCap, FaTools, FaFolder, FaHome, FaUsers, FaBriefcase, FaWallet, FaList, FaSearch } from 'react-icons/fa';
+import { FaGraduationCap, FaTools, FaFolder, FaHome, FaUsers, FaBriefcase, FaWallet, FaList, FaSearch, FaHistory } from 'react-icons/fa';
 import { BsFillPersonPlusFill, BsGraphUpArrow } from "react-icons/bs";
 import { IoDocumentText } from "react-icons/io5";
 import { BsClipboard2PulseFill } from "react-icons/bs";
@@ -22,6 +22,7 @@ const SidebarData = [
   { title: 'Pagamentos', path: '/pagamentos', icon: FaWallet },
   { title: 'Documentos', path: '/docs', icon: IoDocumentText },
   { title: 'Anexos', path: '/anexos', icon: FaFolder },
+  { title: 'Histórico', path: '/historico', icon: FaHistory },
 ];
 
 export default SidebarData;

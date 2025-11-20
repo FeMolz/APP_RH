@@ -6,49 +6,56 @@ import { isAdmin } from '../../middlewares/isAdmin.js';
 const router = Router();
 
 router.get(
-  '/', 
-  isAuthenticated, 
+  '/',
+  isAuthenticated,
   cargosController.listarTodosAtivos
 );
 
 router.get(
-  '/:id', 
-  isAuthenticated, 
+  '/inativos',
+  isAuthenticated,
+  cargosController.listarTodosInativos
+);
+
+router.get(
+  '/:id',
+  isAuthenticated,
   cargosController.buscarPorId
 );
 
 router.post(
-  '/', 
-  isAuthenticated, 
-  isAdmin, 
+  '/',
+  isAuthenticated,
+  isAdmin,
   cargosController.criarCargo
 );
 
 router.put(
-  '/:id', 
-  isAuthenticated, 
-  isAdmin, 
+  '/:id',
+  isAuthenticated,
+  isAdmin,
   cargosController.atualizarCargo
 );
 
 router.delete(
-  '/:id', 
-  isAuthenticated, 
-  isAdmin, 
+  '/:id',
+  isAuthenticated,
+  isAdmin,
   cargosController.inativarCargo
 );
 
 router.post(
   '/:id/quesito',
-  isAuthenticated, 
-  isAdmin, 
+  isAuthenticated,
+  isAdmin,
   cargosController.handleAdicionarQuesito
 );
 
 router.delete(
   '/:id/quesito/:quesitoId',
-  isAuthenticated, 
-  isAdmin, 
+  isAuthenticated,
+  isAdmin,
   cargosController.handleRemoverQuesito
 );
+
 export { router as cargosRoutes };

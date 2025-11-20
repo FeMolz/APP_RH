@@ -1,13 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import funcionariosService from '../services/funcionariosService';
+import cargosService from '../services/cargosService';
 import './EmployeeSearch.css';
-import { FaSearch } from 'react-icons/fa';
+import { FaSearch, FaInfoCircle, FaTimes, FaListUl } from 'react-icons/fa';
 
 const EmployeeSearch = () => {
     const [funcionarios, setFuncionarios] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [searchTerm, setSearchTerm] = useState('');
+
+    // Quesitos Modal State
+    const [showQuesitosModal, setShowQuesitosModal] = useState(false);
+    const [selectedCargoName, setSelectedCargoName] = useState('');
+    const [cargoQuesitos, setCargoQuesitos] = useState([]);
+    const [quesitoLoading, setQuesitoLoading] = useState(false);
 
     useEffect(() => {
         fetchFuncionarios();
@@ -39,6 +46,20 @@ const EmployeeSearch = () => {
     const formatDate = (dateString) => {
         if (!dateString) return '-';
         return new Date(dateString).toLocaleDateString();
+    };
+
+    const handleViewQuesitos = async (cargoId, cargoName) => {
+        setSelectedCargoName(cargoName);
+        setShowQuesitosModal(true);
+        setQuesitoLoading(true);
+        try {
+            const cargoDetails = await cargosService.getCargoById(cargoId);
+            setCargoQuesitos(cargoDetails.quesitos || []);
+        } catch (err) {
+            alert('Erro ao carregar quesitos: ' + err.message);
+        } finally {
+            setQuesitoLoading(false);
+        }
     };
 
     return (
@@ -82,7 +103,20 @@ const EmployeeSearch = () => {
                                                 {func.nome_completo}
                                             </div>
                                         </td>
-                                        <td>{func.cargo?.nome_cargo || '-'}</td>
+                                        <td>
+                                            <div className="cargo-cell-content">
+                                                {func.cargo?.nome_cargo || '-'}
+                                                {func.cargo && func.cargo._count?.quesitos > 0 && (
+                                                    <button
+                                                        className="btn-info-icon"
+                                                        onClick={() => handleViewQuesitos(func.cargo.id, func.cargo.nome_cargo)}
+                                                        title="Ver Quesitos"
+                                                    >
+                                                        <FaListUl />
+                                                    </button>
+                                                )}
+                                            </div>
+                                        </td>
                                         <td><span className="empresa-badge">{func.empresa}</span></td>
                                         <td>{formatDate(func.data_admissao)}</td>
                                         <td>
@@ -107,6 +141,36 @@ const EmployeeSearch = () => {
                             )}
                         </tbody>
                     </table>
+                </div>
+            )}
+
+            {showQuesitosModal && (
+                <div className="modal-overlay">
+                    <div className="modal-content" style={{ maxWidth: '500px' }}>
+                        <button className="modal-close" onClick={() => setShowQuesitosModal(false)}>
+                            <FaTimes />
+                        </button>
+                        <h2>Quesitos - {selectedCargoName}</h2>
+
+                        {quesitoLoading ? (
+                            <div className="loading-small">Carregando...</div>
+                        ) : (
+                            <div className="quesitos-view-list">
+                                {cargoQuesitos.length > 0 ? (
+                                    <ul>
+                                        {cargoQuesitos.map(cq => (
+                                            <li key={cq.quesito.id} className="quesito-view-item">
+                                                <span className="bullet">•</span>
+                                                {cq.quesito.descricao_quesito}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                ) : (
+                                    <p className="no-quesitos">Nenhum quesito vinculado a este cargo.</p>
+                                )}
+                            </div>
+                        )}
+                    </div>
                 </div>
             )}
         </div>

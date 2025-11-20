@@ -22,6 +22,19 @@ const cargosService = {
         return response.json();
     },
 
+    getInativos: async () => {
+        const response = await fetch(`${API_BASE_URL}/api/cargos/inativos`, {
+            headers: getAuthHeaders()
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Erro ao buscar cargos inativos');
+        }
+
+        return response.json();
+    },
+
     createCargo: async (data) => {
         const response = await fetch(`${API_BASE_URL}/api/cargos`, {
             method: 'POST',
@@ -64,6 +77,48 @@ const cargosService = {
         }
 
         return true; // 204 No Content
+    },
+
+    addQuesito: async (cargoId, quesitoId) => {
+        const response = await fetch(`${API_BASE_URL}/api/cargos/${cargoId}/quesito`, {
+            method: 'POST',
+            headers: getAuthHeaders(),
+            body: JSON.stringify({ quesito_id: quesitoId })
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Erro ao adicionar quesito');
+        }
+
+        return response.json();
+    },
+
+    removeQuesito: async (cargoId, quesitoId) => {
+        const response = await fetch(`${API_BASE_URL}/api/cargos/${cargoId}/quesito/${quesitoId}`, {
+            method: 'DELETE',
+            headers: getAuthHeaders()
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Erro ao remover quesito');
+        }
+
+        return true; // 204 No Content
+    },
+
+    getCargoById: async (id) => {
+        const response = await fetch(`${API_BASE_URL}/api/cargos/${id}`, {
+            headers: getAuthHeaders()
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Erro ao buscar cargo');
+        }
+
+        return response.json();
     }
 };
 

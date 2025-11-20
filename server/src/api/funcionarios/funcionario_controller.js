@@ -42,6 +42,16 @@ export const funcionarioController = {
     }
   },
 
+  // GET /funcionarios/inativos
+  async listarTodosInativos(req, res, next) {
+    try {
+      const funcionarios = await funcionarioService.listarInativos();
+      res.status(200).json(funcionarios);
+    } catch (error) {
+      next(error);
+    }
+  },
+
   // GET /funcionarios/:id
   async buscarPorId(req, res, next) {
     try {

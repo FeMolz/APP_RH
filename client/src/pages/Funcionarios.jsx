@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import funcionariosService from '../services/funcionariosService';
 import './Funcionarios.css';
-import { FaSearch, FaPlus, FaUserTie, FaTimes, FaFilter, FaBriefcase } from 'react-icons/fa';
+import { FaSearch, FaPlus, FaUserTie, FaTimes, FaFilter, FaBriefcase, FaEdit, FaTrash } from 'react-icons/fa';
 
 const Funcionarios = () => {
     const [funcionarios, setFuncionarios] = useState([]);
@@ -10,6 +10,7 @@ const Funcionarios = () => {
     const [error, setError] = useState('');
     const [searchTerm, setSearchTerm] = useState('');
     const [showModal, setShowModal] = useState(false);
+    const [editingId, setEditingId] = useState(null);
 
     // Filters
     const [filters, setFilters] = useState({
@@ -77,6 +78,47 @@ const Funcionarios = () => {
         }));
     };
 
+    const handleEdit = (funcionario) => {
+        setEditingId(funcionario.id);
+        setFormData({
+            nome_completo: funcionario.nome_completo,
+            cpf: funcionario.cpf,
+            data_nascimento: funcionario.data_nascimento ? funcionario.data_nascimento.split('T')[0] : '',
+            data_admissao: funcionario.data_admissao.split('T')[0],
+            cargo_id: funcionario.cargo_id,
+            data_contabilidade: funcionario.data_contabilidade ? funcionario.data_contabilidade.split('T')[0] : '',
+            data_desligamento: funcionario.data_desligamento ? funcionario.data_desligamento.split('T')[0] : '',
+            empresa: funcionario.empresa
+        });
+        setShowModal(true);
+    };
+
+    const openNewModal = () => {
+        setEditingId(null);
+        setFormData({
+            nome_completo: '',
+            cpf: '',
+            data_nascimento: '',
+            data_admissao: '',
+            cargo_id: '',
+            data_contabilidade: '',
+            data_desligamento: '',
+            empresa: ''
+        });
+        setShowModal(true);
+    };
+
+    const handleDelete = async (id) => {
+        if (window.confirm('Tem certeza que deseja excluir este funcionário?')) {
+            try {
+                await funcionariosService.deleteFuncionario(id);
+                fetchData();
+            } catch (err) {
+                alert(err.message);
+            }
+        }
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setFormLoading(true);
@@ -84,22 +126,32 @@ const Funcionarios = () => {
         setFormSuccess('');
 
         try {
-            await funcionariosService.createFuncionario(formData);
-            setFormSuccess('Funcionário cadastrado com sucesso!');
-            setFormData({
-                nome_completo: '',
-                cpf: '',
-                data_nascimento: '',
-                data_admissao: '',
-                cargo_id: '',
-                data_contabilidade: '',
-                data_desligamento: '',
-                empresa: ''
-            });
+            if (editingId) {
+                await funcionariosService.updateFuncionario(editingId, formData);
+                setFormSuccess('Funcionário atualizado com sucesso!');
+            } else {
+                await funcionariosService.createFuncionario(formData);
+                setFormSuccess('Funcionário cadastrado com sucesso!');
+            }
+
+            if (!editingId) {
+                setFormData({
+                    nome_completo: '',
+                    cpf: '',
+                    data_nascimento: '',
+                    data_admissao: '',
+                    cargo_id: '',
+                    data_contabilidade: '',
+                    data_desligamento: '',
+                    empresa: ''
+                });
+            }
+
             fetchData(); // Refresh list
             setTimeout(() => {
                 setShowModal(false);
                 setFormSuccess('');
+                setEditingId(null);
             }, 1500);
         } catch (err) {
             setFormError(err.message);
@@ -155,7 +207,7 @@ const Funcionarios = () => {
                     </div>
                 </div>
 
-                <button className="btn-add" onClick={() => setShowModal(true)}>
+                <button className="btn-add" onClick={openNewModal}>
                     <FaPlus /> Novo Funcionário
                 </button>
             </div>
@@ -173,6 +225,7 @@ const Funcionarios = () => {
                                 <th>Cargo</th>
                                 <th>Empresa</th>
                                 <th>Admissão</th>
+                                <th>Ações</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -187,6 +240,16 @@ const Funcionarios = () => {
                                         <td>{func.cargo?.nome_cargo || 'Cargo não definido'}</td>
                                         <td><span className="empresa-badge">{func.empresa}</span></td>
                                         <td>{new Date(func.data_admissao).toLocaleDateString()}</td>
+                                        <td>
+                                            <div className="action-buttons">
+                                                <button className="btn-edit-icon" onClick={() => handleEdit(func)} title="Editar">
+                                                    <FaEdit />
+                                                </button>
+                                                <button className="btn-delete-icon" onClick={() => handleDelete(func.id)} title="Excluir">
+                                                    <FaTrash />
+                                                </button>
+                                            </div>
+                                        </td>
                                     </tr>
                                 ))
                             ) : (
@@ -205,7 +268,7 @@ const Funcionarios = () => {
                         <button className="modal-close" onClick={() => setShowModal(false)}>
                             <FaTimes />
                         </button>
-                        <h2>Novo Funcionário</h2>
+                        <h2>{editingId ? 'Editar Funcionário' : 'Novo Funcionário'}</h2>
 
                         {formSuccess && <div className="alert success">{formSuccess}</div>}
                         {formError && <div className="alert error">{formError}</div>}
@@ -303,7 +366,7 @@ const Funcionarios = () => {
                             </div>
 
                             <button type="submit" className="btn-submit" disabled={formLoading}>
-                                {formLoading ? 'Salvando...' : 'Cadastrar'}
+                                {formLoading ? 'Salvando...' : (editingId ? 'Atualizar' : 'Cadastrar')}
                             </button>
                         </form>
                     </div>

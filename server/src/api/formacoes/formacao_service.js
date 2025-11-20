@@ -25,6 +25,11 @@ export const formacaoService = {
 
   listar: async () => {
     return await prisma.formacao.findMany({
+      where: {
+        funcionario: {
+          ativo: true
+        }
+      },
       include: {
         funcionario: {
           select: {

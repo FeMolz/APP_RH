@@ -20,9 +20,23 @@ export const cargosService = {
     });
   },
 
+  listarInativos: async () => {
+    return await prisma.cargo.findMany({
+      where: { ativo: false },
+      orderBy: { nome_cargo: 'asc' },
+    });
+  },
+
   buscarPorId: async (id) => {
     return await prisma.cargo.findUnique({
       where: { id: id },
+      include: {
+        quesitos: {
+          include: {
+            quesito: true
+          }
+        }
+      }
     });
   },
 

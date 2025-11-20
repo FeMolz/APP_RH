@@ -51,6 +51,48 @@ const funcionariosService = {
         }
 
         return response.json();
+    },
+
+    getInativos: async () => {
+        const response = await fetch(`${API_BASE_URL}/api/funcionarios/inativos`, {
+            headers: getAuthHeaders()
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Erro ao buscar funcionários inativos');
+        }
+
+        return response.json();
+    },
+
+    updateFuncionario: async (id, data) => {
+        const response = await fetch(`${API_BASE_URL}/api/funcionarios/${id}`, {
+            method: 'PUT',
+            headers: getAuthHeaders(),
+            body: JSON.stringify(data)
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Erro ao atualizar funcionário');
+        }
+
+        return response.json();
+    },
+
+    deleteFuncionario: async (id) => {
+        const response = await fetch(`${API_BASE_URL}/api/funcionarios/${id}`, {
+            method: 'DELETE',
+            headers: getAuthHeaders()
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Erro ao excluir funcionário');
+        }
+
+        return true; // 204 No Content
     }
 };
 

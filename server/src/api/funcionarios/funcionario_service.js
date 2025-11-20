@@ -34,6 +34,26 @@ export const funcionarioService = {
       include: {
         cargo: {
           select: {
+            id: true,
+            nome_cargo: true,
+            _count: {
+              select: { quesitos: true }
+            }
+          }
+        },
+        formacoes: true
+      },
+      orderBy: { nome_completo: 'asc' },
+    });
+  },
+
+  listarInativos: async () => {
+    return await prisma.funcionario.findMany({
+      where: { ativo: false },
+      include: {
+        cargo: {
+          select: {
+            id: true,
             nome_cargo: true
           }
         },

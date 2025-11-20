@@ -14,6 +14,8 @@ router.use(isAdmin);
 
 router.get('/', funcionarioController.listarTodosAtivos);
 
+router.get('/inativos', funcionarioController.listarTodosInativos);
+
 router.get('/:id', funcionarioController.buscarPorId);
 
 router.post('/', funcionarioController.criarFuncionario);

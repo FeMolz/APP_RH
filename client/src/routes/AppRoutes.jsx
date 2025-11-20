@@ -4,6 +4,9 @@ import EmployeeSearch from '../pages/EmployeeSearch';
 import Funcionarios from '../pages/Funcionarios';
 import Formacoes from '../pages/Formacoes';
 import Cargos from '../pages/Cargos';
+import Quesitos from '../pages/Quesitos';
+import EPIs from '../pages/EPIs';
+import Historico from '../pages/Historico';
 import Login from '../pages/Login';
 import Register from '../pages/Register';
 import PrivateRoute from '../components/PrivateRoute';
@@ -22,6 +25,9 @@ export default function AppRoutes() {
                     <Route path="cadastros/funcionarios" element={<Funcionarios />} />
                     <Route path="cadastros/formacao" element={<Formacoes />} />
                     <Route path="cadastros/cargos" element={<Cargos />} />
+                    <Route path="cadastros/quesito" element={<Quesitos />} />
+                    <Route path="cadastros/epi" element={<EPIs />} />
+                    <Route path="historico" element={<Historico />} />
                     <Route path="entregas" element={<div>Página de Entregas</div>} />
                     <Route path="avaliacao" element={<div>Página de Avaliação</div>} />
                     <Route path="pagamentos" element={<div>Página de Pagamentos</div>} />

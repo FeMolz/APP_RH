@@ -1,7 +1,7 @@
 import { cargosService } from './cargos_service.js';
 
 export const cargosController = {
-  
+
   async criarCargo(req, res, next) {
     try {
       const novoCargo = await cargosService.criar(req.body);
@@ -20,11 +20,20 @@ export const cargosController = {
     }
   },
 
+  async listarTodosInativos(req, res, next) {
+    try {
+      const cargos = await cargosService.listarInativos();
+      res.status(200).json(cargos);
+    } catch (error) {
+      next(error);
+    }
+  },
+
   async buscarPorId(req, res, next) {
     try {
       const { id } = req.params;
       const cargo = await cargosService.buscarPorId(id);
-      
+
       if (!cargo) {
         return res.status(404).json({ message: 'Cargo não encontrado.' });
       }
@@ -57,13 +66,13 @@ export const cargosController = {
 
   async handleAdicionarQuesito(req, res, next) {
     try {
-      const { id: cargo_id } = req.params; 
-      const { quesito_id } = req.body; 
+      const { id: cargo_id } = req.params;
+      const { quesito_id } = req.body;
 
       if (!quesito_id) {
         return res.status(400).json({ message: 'O campo quesito_id é obrigatório.' });
       }
-      
+
       await cargosService.adicionarQuesito(cargo_id, quesito_id);
       res.status(201).json({ message: 'Quesito vinculado com sucesso.' });
     } catch (error) {
@@ -80,7 +89,7 @@ export const cargosController = {
   async handleRemoverQuesito(req, res, next) {
     try {
       const { id: cargo_id, quesitoId: quesito_id } = req.params;
-      
+
       await cargosService.removerQuesito(cargo_id, quesito_id);
       res.status(204).send();
     } catch (error) {
