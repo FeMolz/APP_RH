@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import DashboardLayout from '../components/layouts/DashboardLayout';
 import EmployeeSearch from '../pages/EmployeeSearch';
 import Funcionarios from '../pages/Funcionarios';
@@ -10,6 +10,8 @@ import Historico from '../pages/Historico';
 import Login from '../pages/Login';
 import Register from '../pages/Register';
 import PrivateRoute from '../components/PrivateRoute';
+import RegistroAuditoria from '../pages/RegistroAuditoria';
+import EntregaEPIs from '../pages/EntregaEPIs';
 
 export default function AppRoutes() {
     return (
@@ -19,7 +21,7 @@ export default function AppRoutes() {
 
             <Route element={<PrivateRoute />}>
                 <Route path="/" element={<DashboardLayout />}>
-                    <Route index element={<EmployeeSearch />} />
+                    <Route index element={<Navigate to="/login" replace />} />
                     <Route path="home" element={<EmployeeSearch />} />
                     <Route path="cadastros" element={<div>Página de Cadastros</div>} />
                     <Route path="cadastros/funcionarios" element={<Funcionarios />} />
@@ -28,7 +30,9 @@ export default function AppRoutes() {
                     <Route path="cadastros/quesito" element={<Quesitos />} />
                     <Route path="cadastros/epi" element={<EPIs />} />
                     <Route path="historico" element={<Historico />} />
-                    <Route path="entregas" element={<div>Página de Entregas</div>} />
+                    <Route path="historico" element={<Historico />} />
+                    <Route path="entregas" element={<EntregaEPIs />} />
+                    <Route path="registro-epis" element={<RegistroAuditoria />} />
                     <Route path="avaliacao" element={<div>Página de Avaliação</div>} />
                     <Route path="pagamentos" element={<div>Página de Pagamentos</div>} />
                     <Route path="docs" element={<div>Página de Documentos</div>} />

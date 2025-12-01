@@ -27,11 +27,17 @@ const Funcionarios = () => {
         cargo_id: '',
         data_contabilidade: '',
         data_desligamento: '',
-        empresa: ''
+        empresa: '',
+        telefone: '',
+        localizacao: ''
     });
     const [formLoading, setFormLoading] = useState(false);
     const [formSuccess, setFormSuccess] = useState('');
     const [formError, setFormError] = useState('');
+
+    // Details Modal State
+    const [showDetailsModal, setShowDetailsModal] = useState(false);
+    const [selectedFuncionario, setSelectedFuncionario] = useState(null);
 
     useEffect(() => {
         fetchData();
@@ -88,7 +94,9 @@ const Funcionarios = () => {
             cargo_id: funcionario.cargo_id,
             data_contabilidade: funcionario.data_contabilidade ? funcionario.data_contabilidade.split('T')[0] : '',
             data_desligamento: funcionario.data_desligamento ? funcionario.data_desligamento.split('T')[0] : '',
-            empresa: funcionario.empresa
+            empresa: funcionario.empresa,
+            telefone: funcionario.telefone || '',
+            localizacao: funcionario.localizacao || ''
         });
         setShowModal(true);
     };
@@ -103,9 +111,16 @@ const Funcionarios = () => {
             cargo_id: '',
             data_contabilidade: '',
             data_desligamento: '',
-            empresa: ''
+            empresa: '',
+            telefone: '',
+            localizacao: ''
         });
         setShowModal(true);
+    };
+
+    const handleViewDetails = (funcionario) => {
+        setSelectedFuncionario(funcionario);
+        setShowDetailsModal(true);
     };
 
     const handleDelete = async (id) => {
@@ -143,7 +158,9 @@ const Funcionarios = () => {
                     cargo_id: '',
                     data_contabilidade: '',
                     data_desligamento: '',
-                    empresa: ''
+                    empresa: '',
+                    telefone: '',
+                    localizacao: ''
                 });
             }
 
@@ -231,7 +248,7 @@ const Funcionarios = () => {
                         <tbody>
                             {filteredFuncionarios.length > 0 ? (
                                 filteredFuncionarios.map(func => (
-                                    <tr key={func.id}>
+                                    <tr key={func.id} onClick={() => handleViewDetails(func)} style={{ cursor: 'pointer' }}>
                                         <td>
                                             <div className="user-cell">
                                                 {func.nome_completo}
@@ -241,7 +258,7 @@ const Funcionarios = () => {
                                         <td><span className="empresa-badge">{func.empresa}</span></td>
                                         <td>{new Date(func.data_admissao).toLocaleDateString()}</td>
                                         <td>
-                                            <div className="action-buttons">
+                                            <div className="action-buttons" onClick={(e) => e.stopPropagation()}>
                                                 <button className="btn-edit-icon" onClick={() => handleEdit(func)} title="Editar">
                                                     <FaEdit />
                                                 </button>
@@ -254,7 +271,7 @@ const Funcionarios = () => {
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan="4" className="no-results">Nenhum funcionário encontrado.</td>
+                                    <td colSpan="5" className="no-results">Nenhum funcionário encontrado.</td>
                                 </tr>
                             )}
                         </tbody>
@@ -264,18 +281,18 @@ const Funcionarios = () => {
 
             {showModal && (
                 <div className="modal-overlay">
-                    <div className="modal-content">
+                    <div className="modal-content new-employee-modal">
                         <button className="modal-close" onClick={() => setShowModal(false)}>
                             <FaTimes />
                         </button>
-                        <h2>{editingId ? 'Editar Funcionário' : 'Novo Funcionário'}</h2>
+                        <h2 className="modal-title">{editingId ? 'Editar Funcionário' : 'Novo Funcionário'}</h2>
 
                         {formSuccess && <div className="alert success">{formSuccess}</div>}
                         {formError && <div className="alert error">{formError}</div>}
 
-                        <form onSubmit={handleSubmit} className="funcionario-form">
+                        <form onSubmit={handleSubmit} className="new-funcionario-form">
                             <div className="form-row">
-                                <div className="form-group">
+                                <div className="form-group full-width">
                                     <label>Nome Completo *</label>
                                     <input
                                         type="text"
@@ -283,8 +300,12 @@ const Funcionarios = () => {
                                         value={formData.nome_completo}
                                         onChange={handleInputChange}
                                         required
+                                        className="form-control"
                                     />
                                 </div>
+                            </div>
+
+                            <div className="form-row">
                                 <div className="form-group">
                                     <label>CPF *</label>
                                     <input
@@ -294,6 +315,17 @@ const Funcionarios = () => {
                                         onChange={handleInputChange}
                                         required
                                         placeholder="000.000.000-00"
+                                        className="form-control"
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <label>Data de Nascimento</label>
+                                    <input
+                                        type="date"
+                                        name="data_nascimento"
+                                        value={formData.data_nascimento}
+                                        onChange={handleInputChange}
+                                        className="form-control"
                                     />
                                 </div>
                             </div>
@@ -306,6 +338,7 @@ const Funcionarios = () => {
                                         value={formData.empresa}
                                         onChange={handleInputChange}
                                         required
+                                        className="form-control"
                                     >
                                         <option value="">Selecione a empresa</option>
                                         <option value="CVF Incorporadora">CVF Incorporadora</option>
@@ -320,6 +353,7 @@ const Funcionarios = () => {
                                         value={formData.cargo_id}
                                         onChange={handleInputChange}
                                         required
+                                        className="form-control"
                                     >
                                         <option value="">Selecione um cargo</option>
                                         {cargos.map(cargo => (
@@ -333,15 +367,6 @@ const Funcionarios = () => {
 
                             <div className="form-row">
                                 <div className="form-group">
-                                    <label>Data de Nascimento</label>
-                                    <input
-                                        type="date"
-                                        name="data_nascimento"
-                                        value={formData.data_nascimento}
-                                        onChange={handleInputChange}
-                                    />
-                                </div>
-                                <div className="form-group">
                                     <label>Data de Admissão *</label>
                                     <input
                                         type="date"
@@ -349,11 +374,9 @@ const Funcionarios = () => {
                                         value={formData.data_admissao}
                                         onChange={handleInputChange}
                                         required
+                                        className="form-control"
                                     />
                                 </div>
-                            </div>
-
-                            <div className="form-row">
                                 <div className="form-group">
                                     <label>Data Contabilidade</label>
                                     <input
@@ -361,14 +384,93 @@ const Funcionarios = () => {
                                         name="data_contabilidade"
                                         value={formData.data_contabilidade}
                                         onChange={handleInputChange}
+                                        className="form-control"
                                     />
                                 </div>
                             </div>
 
-                            <button type="submit" className="btn-submit" disabled={formLoading}>
-                                {formLoading ? 'Salvando...' : (editingId ? 'Atualizar' : 'Cadastrar')}
-                            </button>
+                            <div className="form-row">
+                                <div className="form-group">
+                                    <label>Telefone</label>
+                                    <input
+                                        type="text"
+                                        name="telefone"
+                                        value={formData.telefone}
+                                        onChange={handleInputChange}
+                                        placeholder="(00) 00000-0000"
+                                        className="form-control"
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <label>Localização</label>
+                                    <input
+                                        type="text"
+                                        name="localizacao"
+                                        value={formData.localizacao}
+                                        onChange={handleInputChange}
+                                        placeholder="Ex: Obra A, Escritório Central"
+                                        className="form-control"
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="form-actions">
+                                <button type="submit" className="btn-submit" disabled={formLoading}>
+                                    {formLoading ? 'Salvando...' : (editingId ? 'Atualizar' : 'Cadastrar')}
+                                </button>
+                            </div>
                         </form>
+                    </div>
+                </div>
+            )}
+
+            {/* Details Modal */}
+            {showDetailsModal && selectedFuncionario && (
+                <div className="modal-overlay">
+                    <div className="modal-content details-modal">
+                        <button className="modal-close" onClick={() => setShowDetailsModal(false)}>
+                            <FaTimes />
+                        </button>
+                        <h2>Detalhes do Funcionário</h2>
+
+                        <div className="details-grid">
+                            <div className="detail-item">
+                                <strong>Nome Completo:</strong>
+                                <span>{selectedFuncionario.nome_completo}</span>
+                            </div>
+                            <div className="detail-item">
+                                <strong>CPF:</strong>
+                                <span>{selectedFuncionario.cpf}</span>
+                            </div>
+                            <div className="detail-item">
+                                <strong>Cargo:</strong>
+                                <span>{selectedFuncionario.cargo?.nome_cargo || 'N/A'}</span>
+                            </div>
+                            <div className="detail-item">
+                                <strong>Empresa:</strong>
+                                <span>{selectedFuncionario.empresa}</span>
+                            </div>
+                            <div className="detail-item">
+                                <strong>Telefone:</strong>
+                                <span>{selectedFuncionario.telefone || 'Não informado'}</span>
+                            </div>
+                            <div className="detail-item">
+                                <strong>Localização:</strong>
+                                <span>{selectedFuncionario.localizacao || 'Não informada'}</span>
+                            </div>
+                            <div className="detail-item">
+                                <strong>Data de Nascimento:</strong>
+                                <span>{selectedFuncionario.data_nascimento ? new Date(selectedFuncionario.data_nascimento).toLocaleDateString() : 'N/A'}</span>
+                            </div>
+                            <div className="detail-item">
+                                <strong>Data de Admissão:</strong>
+                                <span>{new Date(selectedFuncionario.data_admissao).toLocaleDateString()}</span>
+                            </div>
+                            <div className="detail-item">
+                                <strong>Data Contabilidade:</strong>
+                                <span>{selectedFuncionario.data_contabilidade ? new Date(selectedFuncionario.data_contabilidade).toLocaleDateString() : 'N/A'}</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             )}

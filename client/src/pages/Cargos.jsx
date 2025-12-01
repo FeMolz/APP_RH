@@ -147,7 +147,7 @@ const Cargos = () => {
     const handleAddQuesito = async () => {
         if (!selectedQuesitoId) return;
         try {
-            await cargosService.addQuesito(selectedCargo.id, selectedQuesitoId);
+            await cargosService.addQuesitoToCargo(selectedCargo.id, selectedQuesitoId);
             // Refresh cargo quesitos
             const updatedCargo = await cargosService.getCargoById(selectedCargo.id);
             setCargoQuesitos(updatedCargo.quesitos || []);
@@ -159,7 +159,7 @@ const Cargos = () => {
 
     const handleRemoveQuesito = async (quesitoId) => {
         try {
-            await cargosService.removeQuesito(selectedCargo.id, quesitoId);
+            await cargosService.removeQuesitoFromCargo(selectedCargo.id, quesitoId);
             // Refresh cargo quesitos
             const updatedCargo = await cargosService.getCargoById(selectedCargo.id);
             setCargoQuesitos(updatedCargo.quesitos || []);

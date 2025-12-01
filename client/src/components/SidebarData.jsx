@@ -18,6 +18,7 @@ const SidebarData = [
     ]
   },
   { title: 'Entrega EPIs', path: '/entregas', icon: FaTools },
+  { title: 'Registro EPIs', path: '/registro-epis', icon: FaHistory },
   { title: 'Avaliação', path: '/avaliacao', icon: BsClipboard2PulseFill },
   { title: 'Pagamentos', path: '/pagamentos', icon: FaWallet },
   { title: 'Documentos', path: '/docs', icon: IoDocumentText },

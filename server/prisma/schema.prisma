@@ -4,7 +4,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL") 
+  url      = env("DATABASE_URL")
 }
 
 //TABELAS
@@ -15,13 +15,13 @@ model Usuario {
   nome       String
   email      String   @unique
   senha_hash String
-  role       String   // 'ADMIN' ou 'TECNICO'
+  role       String // 'ADMIN' ou 'TECNICO'
   ativo      Boolean  @default(true)
   criado_em  DateTime @default(now())
 
   entregas_feitas EntregasEPI[]
 
-  @@map("usuarios") 
+  @@map("usuarios")
 }
 
 //Tabela de Cargos
@@ -33,7 +33,7 @@ model Cargo {
   criado_em  DateTime @default(now())
 
   funcionarios Funcionario[]
-  quesitos  QuesitosEmCargo[]
+  quesitos     QuesitosEmCargo[]
 
   @@map("cargos")
 }
@@ -48,28 +48,31 @@ model Funcionario {
   data_contabilidade DateTime? @db.Date
   data_desligamento  DateTime? @db.Date // [Nullable]
   ativo              Boolean   @default(true)
-  empresa            String    // 'CVF Incorporadora', 'Ligasul', 'Vivant'
+  empresa            String // 'CVF Incorporadora', 'Ligasul', 'Vivant'
+  telefone           String?
+  localizacao        String?
   criado_em          DateTime  @default(now())
 
-
-  cargo_id String    @db.Uuid
-  cargo    Cargo     @relation(fields: [cargo_id], references: [id], onDelete: Restrict) 
+  cargo_id  String     @db.Uuid
+  cargo     Cargo      @relation(fields: [cargo_id], references: [id], onDelete: Restrict)
   formacoes Formacao[]
 
   entregas_recebidas EntregasEPI[]
+  relatorios         RelatorioEntrega[]
 
   @@map("funcionarios")
 }
 
 //Tabela de EPIs
 model EPI {
-  id           String   @id @default(uuid()) @db.Uuid
-  nome_epi     String
-  ca_numero    String   @unique
-  validade_ca  DateTime @db.Date
-  descricao    String?
-  ativo        Boolean  @default(true)
-
+  id            String   @id @default(uuid()) @db.Uuid
+  nome_epi      String
+  ca_numero     String
+  validade_ca   DateTime
+  descricao     String?
+  validade_dias Int      @default(365)
+  ativo         Boolean  @default(true)
+  criado_em     DateTime @default(now())
 
   entregas EntregasEPI[]
 
@@ -78,12 +81,13 @@ model EPI {
 
 //Tabela de Entregas de EPI (Registro de Auditoria)
 model EntregasEPI {
-  id              String    @id @default(uuid()) @db.Uuid
-  data_entrega    DateTime  @default(now())
-  quantidade      Int       @default(1)
-  status          String    @default("ATIVO") 
-  motivo_estorno  String?
-  data_estorno    DateTime?
+  id             String    @id @default(uuid()) @db.Uuid
+  data_entrega   DateTime  @default(now())
+  quantidade     Int       @default(1)
+  status         String    @default("ATIVO")
+  motivo_estorno String?
+  data_estorno   DateTime?
+  validade_dias  Int?
 
   //A entrega foi feita POR UM usuário
   usuario_id String  @db.Uuid
@@ -97,30 +101,33 @@ model EntregasEPI {
   epi_id String @db.Uuid
   epi    EPI    @relation(fields: [epi_id], references: [id])
 
+  // Relatório associado (se houver)
+  relatorio_id String?           @db.Uuid
+  relatorio    RelatorioEntrega? @relation(fields: [relatorio_id], references: [id])
+
   @@map("entregas_epi")
 }
 
 //Tabela de Formações
 model Formacao {
-  id             String    @id @default(uuid()) @db.Uuid
-  nome_formacao  String    
-  instituicao    String    
-  nivel          String    
-  data_inicio    DateTime  @db.Date
-  data_conclusao DateTime  @db.Date
+  id             String   @id @default(uuid()) @db.Uuid
+  nome_formacao  String
+  instituicao    String
+  nivel          String
+  data_inicio    DateTime @db.Date
+  data_conclusao DateTime @db.Date
   descricao      String?
 
   funcionario_id String      @db.Uuid
   funcionario    Funcionario @relation(fields: [funcionario_id], references: [id])
 
   @@map("formacoes")
-
 }
 
 //Tabela de Quesitos (Catálogo)
 model Quesito {
-  id                String   @id @default(uuid()) @db.Uuid
-  descricao_quesito String   @unique
+  id                String @id @default(uuid()) @db.Uuid
+  descricao_quesito String @unique
 
   cargos QuesitosEmCargo[]
 
@@ -132,9 +139,23 @@ model QuesitosEmCargo {
   cargo_id   String @db.Uuid
   quesito_id String @db.Uuid
 
-  cargo    Cargo    @relation(fields: [cargo_id], references: [id])
-  quesito  Quesito  @relation(fields: [quesito_id], references: [id])
+  cargo   Cargo   @relation(fields: [cargo_id], references: [id])
+  quesito Quesito @relation(fields: [quesito_id], references: [id])
 
   @@id([cargo_id, quesito_id]) // Define a chave primária composta
   @@map("cargos_quesitos")
+}
+
+// Tabela de Relatórios de Entrega/Devolução
+model RelatorioEntrega {
+  id              String   @id @default(uuid()) @db.Uuid
+  data_geracao    DateTime @default(now())
+  caminho_arquivo String
+
+  funcionario_id String      @db.Uuid
+  funcionario    Funcionario @relation(fields: [funcionario_id], references: [id])
+
+  entregas EntregasEPI[]
+
+  @@map("relatorios_entrega")
 }

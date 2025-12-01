@@ -1,124 +1,37 @@
-const API_BASE_URL = 'http://localhost:3001';
-
-const getAuthHeaders = () => {
-    const token = localStorage.getItem('token');
-    return {
-        'Content-Type': 'application/json',
-        'Authorization': token ? `Bearer ${token}` : ''
-    };
-};
+import { api } from './api';
 
 const cargosService = {
     getCargos: async () => {
-        const response = await fetch(`${API_BASE_URL}/api/cargos`, {
-            headers: getAuthHeaders()
-        });
-
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || 'Erro ao buscar cargos');
-        }
-
-        return response.json();
+        return api.get('/api/cargos');
     },
 
     getInativos: async () => {
-        const response = await fetch(`${API_BASE_URL}/api/cargos/inativos`, {
-            headers: getAuthHeaders()
-        });
-
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || 'Erro ao buscar cargos inativos');
-        }
-
-        return response.json();
-    },
-
-    createCargo: async (data) => {
-        const response = await fetch(`${API_BASE_URL}/api/cargos`, {
-            method: 'POST',
-            headers: getAuthHeaders(),
-            body: JSON.stringify(data)
-        });
-
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || 'Erro ao criar cargo');
-        }
-
-        return response.json();
-    },
-
-    updateCargo: async (id, data) => {
-        const response = await fetch(`${API_BASE_URL}/api/cargos/${id}`, {
-            method: 'PUT',
-            headers: getAuthHeaders(),
-            body: JSON.stringify(data)
-        });
-
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || 'Erro ao atualizar cargo');
-        }
-
-        return response.json();
-    },
-
-    deleteCargo: async (id) => {
-        const response = await fetch(`${API_BASE_URL}/api/cargos/${id}`, {
-            method: 'DELETE',
-            headers: getAuthHeaders()
-        });
-
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || 'Erro ao excluir cargo');
-        }
-
-        return true; // 204 No Content
-    },
-
-    addQuesito: async (cargoId, quesitoId) => {
-        const response = await fetch(`${API_BASE_URL}/api/cargos/${cargoId}/quesito`, {
-            method: 'POST',
-            headers: getAuthHeaders(),
-            body: JSON.stringify({ quesito_id: quesitoId })
-        });
-
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || 'Erro ao adicionar quesito');
-        }
-
-        return response.json();
-    },
-
-    removeQuesito: async (cargoId, quesitoId) => {
-        const response = await fetch(`${API_BASE_URL}/api/cargos/${cargoId}/quesito/${quesitoId}`, {
-            method: 'DELETE',
-            headers: getAuthHeaders()
-        });
-
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || 'Erro ao remover quesito');
-        }
-
-        return true; // 204 No Content
+        return api.get('/api/cargos/inativos');
     },
 
     getCargoById: async (id) => {
-        const response = await fetch(`${API_BASE_URL}/api/cargos/${id}`, {
-            headers: getAuthHeaders()
-        });
+        return api.get(`/api/cargos/${id}`);
+    },
 
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || 'Erro ao buscar cargo');
-        }
+    createCargo: async (data) => {
+        return api.post('/api/cargos', data);
+    },
 
-        return response.json();
+    updateCargo: async (id, data) => {
+        return api.put(`/api/cargos/${id}`, data);
+    },
+
+    deleteCargo: async (id) => {
+        return api.delete(`/api/cargos/${id}`);
+    },
+
+    // Quesitos relation
+    addQuesitoToCargo: async (cargoId, quesitoId) => {
+        return api.post(`/api/cargos/${cargoId}/quesito`, { quesito_id: quesitoId });
+    },
+
+    removeQuesitoFromCargo: async (cargoId, quesitoId) => {
+        return api.delete(`/api/cargos/${cargoId}/quesito/${quesitoId}`);
     }
 };
 

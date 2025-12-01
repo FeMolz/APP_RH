@@ -1,5 +1,5 @@
 .primary_sidebar {
-    height: 100vh;
+    min-height: 100vh;
     width: 250px;
     background-color: #2f4050;
     color: #ffffff;
@@ -13,6 +13,7 @@
     font-size: 1.05rem;
     text-align: center;
     border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    flex-shrink: 0;
 }
 
 .sidebar_nav {

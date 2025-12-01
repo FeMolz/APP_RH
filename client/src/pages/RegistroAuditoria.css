@@ -1,0 +1,284 @@
+.registro-auditoria-container {
+    padding: 2rem;
+    background-color: #f8f9fa;
+    min-height: 100vh;
+}
+
+.registro-auditoria-container .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    width: 100%;
+    /* Ensure full width */
+    max-width: none;
+    /* Override potential global max-width */
+}
+
+.registro-auditoria-container .page-header h1 {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #2c3e50;
+    font-size: 1.8rem;
+    margin: 0;
+    /* Reset margin */
+}
+
+.registro-auditoria-container .search-bar {
+    position: relative;
+    width: 450px;
+}
+
+.registro-auditoria-container .search-icon {
+    position: absolute;
+    left: 15px;
+    /* Slightly more padding */
+    top: 50%;
+    transform: translateY(-50%);
+    color: #95a5a6;
+    z-index: 1;
+    pointer-events: none;
+    /* Allow clicking through to input */
+}
+
+.registro-auditoria-container .search-bar input {
+    width: 100%;
+    padding: 0.8rem 1rem 0.8rem 2.8rem;
+    /* Adjusted for icon */
+    border: 1px solid #bdc3c7;
+    border-radius: 25px;
+    /* More rounded */
+    outline: none;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+    background-color: white;
+}
+
+.registro-auditoria-container .search-bar input:focus {
+    border-color: #17a2b8;
+    box-shadow: 0 0 0 3px rgba(23, 162, 184, 0.15);
+    /* Slightly stronger shadow */
+}
+
+.registro-auditoria-container .table-container {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+}
+
+.registro-auditoria-container .data-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.registro-auditoria-container .data-table th,
+.registro-auditoria-container .data-table td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid #ecf0f1;
+}
+
+.registro-auditoria-container .data-table th {
+    background-color: #f1f2f6;
+    color: #7f8c8d;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+}
+
+.registro-auditoria-container .data-table tr:hover {
+    background-color: #f8f9fa;
+}
+
+.registro-auditoria-container .funcionario-info,
+.registro-auditoria-container .epi-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.registro-auditoria-container .funcionario-info .nome,
+.registro-auditoria-container .epi-info .nome {
+    font-weight: 500;
+    color: #2c3e50;
+}
+
+.registro-auditoria-container .funcionario-info .cpf,
+.registro-auditoria-container .epi-info .ca {
+    font-size: 0.8rem;
+    color: #7f8c8d;
+}
+
+.registro-auditoria-container .status-badge {
+    padding: 0.25rem 0.5rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.registro-auditoria-container .status-badge.ativo {
+    background-color: #e8f8f5;
+    color: #2ecc71;
+}
+
+.registro-auditoria-container {
+    padding: 2rem;
+    background-color: #f8f9fa;
+    min-height: 100vh;
+}
+
+.registro-auditoria-container .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    width: 100%;
+    /* Ensure full width */
+    max-width: none;
+    /* Override potential global max-width */
+}
+
+.registro-auditoria-container .page-header h1 {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #2c3e50;
+    font-size: 1.8rem;
+    margin: 0;
+    /* Reset margin */
+}
+
+.registro-auditoria-container .search-bar {
+    position: relative;
+    width: 450px;
+}
+
+.registro-auditoria-container .search-icon {
+    position: absolute;
+    left: 15px;
+    /* Slightly more padding */
+    top: 50%;
+    transform: translateY(-50%);
+    color: #95a5a6;
+    z-index: 1;
+    pointer-events: none;
+    /* Allow clicking through to input */
+}
+
+.registro-auditoria-container .search-bar input {
+    width: 100%;
+    padding: 0.8rem 1rem 0.8rem 2.8rem;
+    /* Adjusted for icon */
+    border: 1px solid #bdc3c7;
+    border-radius: 25px;
+    /* More rounded */
+    outline: none;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+    background-color: white;
+}
+
+.registro-auditoria-container .search-bar input:focus {
+    border-color: #17a2b8;
+    box-shadow: 0 0 0 3px rgba(23, 162, 184, 0.15);
+    /* Slightly stronger shadow */
+}
+
+.registro-auditoria-container .table-container {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+}
+
+.registro-auditoria-container .data-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.registro-auditoria-container .data-table th,
+.registro-auditoria-container .data-table td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid #ecf0f1;
+}
+
+.registro-auditoria-container .data-table th {
+    background-color: #f1f2f6;
+    color: #7f8c8d;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+}
+
+.registro-auditoria-container .data-table tr:hover {
+    background-color: #f8f9fa;
+}
+
+.registro-auditoria-container .funcionario-info,
+.registro-auditoria-container .epi-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.registro-auditoria-container .funcionario-info .nome,
+.registro-auditoria-container .epi-info .nome {
+    font-weight: 500;
+    color: #2c3e50;
+}
+
+.registro-auditoria-container .funcionario-info .cpf,
+.registro-auditoria-container .epi-info .ca {
+    font-size: 0.8rem;
+    color: #7f8c8d;
+}
+
+.registro-auditoria-container .status-badge {
+    padding: 0.25rem 0.5rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.registro-auditoria-container .status-badge.ativo {
+    background-color: #e8f8f5;
+    color: #2ecc71;
+}
+
+.registro-auditoria-container .status-badge.estornado {
+    background-color: #fdedec;
+    color: #e74c3c;
+}
+
+.registro-auditoria-container .no-data {
+    text-align: center;
+    color: #95a5a6;
+    padding: 2rem;
+}
+
+.registro-auditoria-container .btn-download {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1.2rem;
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(231, 76, 60, 0.2);
+}
+
+.registro-auditoria-container .btn-download:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(231, 76, 60, 0.3);
+    background: linear-gradient(135deg, #ec7063, #e74c3c);
+}
+
+.registro-auditoria-container .btn-download svg {
+    font-size: 1.1rem;
+}
