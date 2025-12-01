@@ -13,6 +13,7 @@ const EntregaEPIs = () => {
     const [epis, setEpis] = useState([]);
     const [historico, setHistorico] = useState([]);
     const [episAtivos, setEpisAtivos] = useState([]); // For return tab
+    const [returnDates, setReturnDates] = useState({});
 
     // ... (rest of the component state)
 
@@ -52,7 +53,8 @@ const EntregaEPIs = () => {
                 item.epi.nome_epi,
                 item.epi.ca_numero,
                 new Date(item.data_entrega).toLocaleDateString(),
-                item.status === 'DEVOLVIDO' ? 'Devolvido' : 'Em uso'
+                item.data_devolucao ? new Date(item.data_devolucao).toLocaleDateString() : '-',
+                item.status === 'DEVOLVIDO' ? 'Registrado' : 'Em uso'
             ]);
 
             console.log('Table data prepared', tableData);
@@ -60,7 +62,7 @@ const EntregaEPIs = () => {
             // Use autoTable function directly
             autoTable(doc, {
                 startY: 60,
-                head: [['EPI', 'CA', 'Data Entrega', 'Status']],
+                head: [['EPI', 'CA', 'Data Entrega Inicial', 'Data Registro Entrega', 'Status']],
                 body: tableData,
             });
 
@@ -198,25 +200,26 @@ const EntregaEPIs = () => {
 
 
 
-    const handleDevolver = async (id) => {
-        if (!window.confirm('Confirmar devolução deste EPI?')) return;
+    const handleRegistrarEntrega = async (id) => {
+        const date = returnDates[id] || new Date().toISOString().split('T')[0];
+        if (!window.confirm('Confirmar registro de entrega deste EPI?')) return;
 
         try {
-            await entregaService.devolver(id);
-            setSuccess('EPI devolvido com sucesso!');
+            await entregaService.devolver(id, date);
+            setSuccess('Entrega registrada com sucesso!');
 
-            // Refresh lists
             if (selectedFuncionarioReturn) {
                 loadEpisAtivos(selectedFuncionarioReturn);
                 loadHistorico(selectedFuncionarioReturn, 'DEVOLVIDO');
             }
-
-
-
         } catch (err) {
-            console.error('Erro ao devolver EPI:', err);
-            setError('Erro ao registrar devolução.');
+            console.error('Erro ao registrar entrega:', err);
+            setError('Erro ao registrar entrega.');
         }
+    };
+
+    const handleDateChange = (id, date) => {
+        setReturnDates(prev => ({ ...prev, [id]: date }));
     };
 
     const handleSubmit = async (e) => {
@@ -311,7 +314,7 @@ const EntregaEPIs = () => {
                             className={`tab-btn ${activeTab === 'devolver' ? 'active' : ''}`}
                             onClick={() => setActiveTab('devolver')}
                         >
-                            Registrar Devolução
+                            Registrar Entrega
                         </button>
                     </div>
                 </div>
@@ -408,7 +411,7 @@ const EntregaEPIs = () => {
                 {activeTab === 'devolver' && (
                     <section className="return-section">
                         <div className="card">
-                            <h3>Registrar Devolução</h3>
+                            <h3>Registrar Entrega (Substituição/Devolução)</h3>
                             <div className="form-group">
                                 <label>Selecione o Funcionário</label>
                                 <select
@@ -426,23 +429,64 @@ const EntregaEPIs = () => {
 
                             {selectedFuncionarioReturn && (
                                 <div className="active-epis-list">
-                                    <h4>EPIs em Posse (Ativos)</h4>
-                                    {episAtivos.length === 0 ? (
-                                        <p className="text-muted">Este funcionário não possui EPIs ativos.</p>
+                                    {/* VENCIDOS */}
+                                    <h4 className="section-title vencidos">EPIs em Posse (Vencidos)</h4>
+                                    {episAtivos.filter(e => getStatus(e) === 'VENCIDO').length === 0 ? (
+                                        <p className="text-muted">Nenhum EPI vencido.</p>
                                     ) : (
                                         <div className="epi-grid">
-                                            {episAtivos.map(entrega => (
+                                            {episAtivos.filter(e => getStatus(e) === 'VENCIDO').map(entrega => (
+                                                <div key={entrega.id} className="epi-card-active vencido-card">
+                                                    <div className="epi-info">
+                                                        <strong>{entrega.epi.nome_epi}</strong>
+                                                        <span> Entregue: {new Date(entrega.data_entrega).toLocaleDateString()}</span>
+                                                        <span className="badge-vencido">VENCIDO</span>
+                                                    </div>
+                                                    <div className="epi-actions">
+                                                        <input
+                                                            type="date"
+                                                            value={returnDates[entrega.id] || new Date().toISOString().split('T')[0]}
+                                                            onChange={(e) => handleDateChange(entrega.id, e.target.value)}
+                                                            className="date-input-small"
+                                                        />
+                                                        <button
+                                                            className="btn-return"
+                                                            onClick={() => handleRegistrarEntrega(entrega.id)}
+                                                        >
+                                                            Registrar Entrega
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+
+                                    {/* EM DIA */}
+                                    <h4 className="section-title">EPIs em Posse (Em Dia)</h4>
+                                    {episAtivos.filter(e => getStatus(e) !== 'VENCIDO').length === 0 ? (
+                                        <p className="text-muted">Nenhum EPI em dia.</p>
+                                    ) : (
+                                        <div className="epi-grid">
+                                            {episAtivos.filter(e => getStatus(e) !== 'VENCIDO').map(entrega => (
                                                 <div key={entrega.id} className="epi-card-active">
                                                     <div className="epi-info">
                                                         <strong>{entrega.epi.nome_epi}</strong>
-                                                        <span> Entregue em: {new Date(entrega.data_entrega).toLocaleDateString()}</span>
+                                                        <span> Entregue: {new Date(entrega.data_entrega).toLocaleDateString()}</span>
                                                     </div>
-                                                    <button
-                                                        className="btn-return"
-                                                        onClick={() => handleDevolver(entrega.id)}
-                                                    >
-                                                        Devolver
-                                                    </button>
+                                                    <div className="epi-actions">
+                                                        <input
+                                                            type="date"
+                                                            value={returnDates[entrega.id] || new Date().toISOString().split('T')[0]}
+                                                            onChange={(e) => handleDateChange(entrega.id, e.target.value)}
+                                                            className="date-input-small"
+                                                        />
+                                                        <button
+                                                            className="btn-return"
+                                                            onClick={() => handleRegistrarEntrega(entrega.id)}
+                                                        >
+                                                            Registrar Entrega
+                                                        </button>
+                                                    </div>
                                                 </div>
                                             ))}
                                         </div>

@@ -88,6 +88,7 @@ model EntregasEPI {
   motivo_estorno String?
   data_estorno   DateTime?
   validade_dias  Int?
+  data_devolucao DateTime?
 
   //A entrega foi feita POR UM usuário
   usuario_id String  @db.Uuid

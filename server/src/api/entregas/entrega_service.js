@@ -110,11 +110,12 @@ export const entregaService = {
         return vencidos;
     },
 
-    async devolver(id) {
+    async devolver(id, data_devolucao) {
         return await prisma.entregasEPI.update({
             where: { id },
             data: {
-                status: 'DEVOLVIDO'
+                status: 'DEVOLVIDO',
+                data_devolucao: data_devolucao ? new Date(data_devolucao) : new Date()
             }
         });
     }

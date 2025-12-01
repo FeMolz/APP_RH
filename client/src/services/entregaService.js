@@ -18,7 +18,7 @@ export const entregaService = {
         return api.post('/api/entregas', dados);
     },
 
-    devolver: async (id) => {
-        return api.put(`/api/entregas/${id}/devolver`);
+    devolver: async (id, data_devolucao) => {
+        return api.put(`/api/entregas/${id}/devolver`, { data_devolucao });
     }
 };

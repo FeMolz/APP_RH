@@ -45,7 +45,8 @@ export const entregaController = {
     async devolver(req, res, next) {
         try {
             const { id } = req.params;
-            const entrega = await entregaService.devolver(id);
+            const { data_devolucao } = req.body;
+            const entrega = await entregaService.devolver(id, data_devolucao);
             res.json(entrega);
         } catch (error) {
             next(error);
