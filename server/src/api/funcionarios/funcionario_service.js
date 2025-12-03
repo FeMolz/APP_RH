@@ -4,7 +4,7 @@ const prisma = new PrismaClient();
 export const funcionarioService = {
 
   criar: async (dados) => {
-    const { nome_completo, cpf, data_admissao, cargo_id, data_contabilidade, data_nascimento, empresa } = dados;
+    const { nome_completo, cpf, data_admissao, cargo_id, data_contabilidade, data_nascimento, empresa, telefone, localizacao } = dados;
     return await prisma.funcionario.create({
       data: {
         nome_completo,
@@ -14,6 +14,8 @@ export const funcionarioService = {
         data_contabilidade: data_contabilidade ? new Date(data_contabilidade) : undefined,
         data_nascimento: data_nascimento ? new Date(data_nascimento) : undefined,
         empresa,
+        telefone,
+        localizacao
       },
     });
   },
@@ -98,7 +100,7 @@ export const funcionarioService = {
   },
 
   atualizar: async (id, dados) => {
-    const { nome_completo, cpf, data_admissao, cargo_id, data_contabilidade, data_nascimento, empresa } = dados;
+    const { nome_completo, cpf, data_admissao, cargo_id, data_contabilidade, data_nascimento, empresa, telefone, localizacao } = dados;
 
     return await prisma.funcionario.update({
       where: { id: id },
@@ -110,6 +112,8 @@ export const funcionarioService = {
         data_contabilidade: data_contabilidade ? new Date(data_contabilidade) : undefined,
         data_nascimento: data_nascimento ? new Date(data_nascimento) : undefined,
         empresa,
+        telefone,
+        localizacao
       },
     });
   },

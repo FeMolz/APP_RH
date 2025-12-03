@@ -7,20 +7,8 @@ import fs from 'fs';
 const router = express.Router();
 
 // Configure multer for file upload
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        const uploadDir = 'uploads/relatorios';
-        // Create directory if it doesn't exist
-        if (!fs.existsSync(uploadDir)) {
-            fs.mkdirSync(uploadDir, { recursive: true });
-        }
-        cb(null, uploadDir);
-    },
-    filename: function (req, file, cb) {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        cb(null, uniqueSuffix + '-' + file.originalname);
-    }
-});
+// Configure multer for memory storage (to save in DB)
+const storage = multer.memoryStorage();
 
 const upload = multer({ storage: storage });
 

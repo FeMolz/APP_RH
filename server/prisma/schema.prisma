@@ -151,7 +151,8 @@ model QuesitosEmCargo {
 model RelatorioEntrega {
   id              String   @id @default(uuid()) @db.Uuid
   data_geracao    DateTime @default(now())
-  caminho_arquivo String
+  caminho_arquivo String?
+  arquivo_dados   Bytes?
 
   funcionario_id String      @db.Uuid
   funcionario    Funcionario @relation(fields: [funcionario_id], references: [id])

@@ -11,7 +11,8 @@ const relatorioService = {
             const relatorio = await tx.relatorioEntrega.create({
                 data: {
                     funcionario_id,
-                    caminho_arquivo
+                    caminho_arquivo: dados.nome_arquivo, // Storing filename in path field for reference, or null
+                    arquivo_dados: dados.buffer // Buffer from multer
                 }
             });
 

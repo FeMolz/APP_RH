@@ -19,11 +19,14 @@ const relatorioController = {
 
             const relatorio = await relatorioService.criar({
                 funcionario_id,
-                caminho_arquivo: req.file.path,
+                nome_arquivo: req.file.originalname,
+                buffer: req.file.buffer,
                 entrega_ids: parsedEntregaIds
             });
 
-            res.status(201).json(relatorio);
+            // Don't send the huge buffer back in the response
+            const { arquivo_dados, ...relatorioSemBuffer } = relatorio;
+            res.status(201).json(relatorioSemBuffer);
         } catch (error) {
             console.error('Erro ao criar relatório:', error);
             res.status(500).json({ message: 'Erro interno ao salvar relatório.' });
@@ -33,7 +36,12 @@ const relatorioController = {
     listar: async (req, res) => {
         try {
             const relatorios = await relatorioService.listar();
-            res.json(relatorios);
+            // Map to remove buffer from list to save bandwidth
+            const relatoriosSemBuffer = relatorios.map(r => {
+                const { arquivo_dados, ...rest } = r;
+                return rest;
+            });
+            res.json(relatoriosSemBuffer);
         } catch (error) {
             console.error('Erro ao listar relatórios:', error);
             res.status(500).json({ message: 'Erro interno ao listar relatórios.' });
@@ -45,16 +53,17 @@ const relatorioController = {
             const { id } = req.params;
             const relatorio = await relatorioService.buscarPorId(id);
 
-            if (!relatorio) {
-                return res.status(404).json({ message: 'Relatório não encontrado.' });
+            if (!relatorio || !relatorio.arquivo_dados) {
+                return res.status(404).json({ message: 'Relatório ou arquivo não encontrado.' });
             }
 
-            const filePath = path.resolve(relatorio.caminho_arquivo);
-            if (fs.existsSync(filePath)) {
-                res.download(filePath);
-            } else {
-                res.status(404).json({ message: 'Arquivo não encontrado no servidor.' });
-            }
+            // Set headers for download
+            res.setHeader('Content-Type', 'application/pdf');
+            res.setHeader('Content-Disposition', `attachment; filename="${relatorio.caminho_arquivo || 'relatorio.pdf'}"`);
+
+            // Send buffer
+            res.send(relatorio.arquivo_dados);
+
         } catch (error) {
             console.error('Erro ao baixar relatório:', error);
             res.status(500).json({ message: 'Erro interno ao baixar relatório.' });
