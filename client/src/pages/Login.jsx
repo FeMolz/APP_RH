@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { FaEnvelope, FaLock } from 'react-icons/fa';
 import authService from '../services/authService';
 import './Login.css';
 
 const Login = () => {
+    console.log("Login component loaded - Redesign Active");
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
@@ -34,25 +36,31 @@ const Login = () => {
                 <form onSubmit={handleSubmit}>
                     <div className="form-group">
                         <label htmlFor="email">Email</label>
-                        <input
-                            type="email"
-                            id="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            required
-                            placeholder="seu@email.com"
-                        />
+                        <div className="input-wrapper">
+                            <FaEnvelope className="input-icon" />
+                            <input
+                                type="email"
+                                id="email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                required
+                                placeholder="seu@email.com"
+                            />
+                        </div>
                     </div>
                     <div className="form-group">
                         <label htmlFor="password">Senha</label>
-                        <input
-                            type="password"
-                            id="password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            required
-                            placeholder="Sua senha"
-                        />
+                        <div className="input-wrapper">
+                            <FaLock className="input-icon" />
+                            <input
+                                type="password"
+                                id="password"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                required
+                                placeholder="Sua senha"
+                            />
+                        </div>
                     </div>
                     <button type="submit" className="login-btn" disabled={loading}>
                         {loading ? 'Entrando...' : 'Entrar'}

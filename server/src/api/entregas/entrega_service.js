@@ -110,6 +110,101 @@ export const entregaService = {
         return vencidos;
     },
 
+    async listarParaRelatorio(funcionarioId, dataInicio, dataFim) {
+        try {
+            console.log('--- Debug Relatorio ---');
+            console.log('Params:', { funcionarioId, dataInicio, dataFim });
+
+            if (!funcionarioId) {
+                throw new Error('ID do funcionário é obrigatório.');
+            }
+
+            // funcionario_id is a UUID string, do not parse as Int
+            const where = {
+                funcionario_id: funcionarioId,
+            };
+
+            if (dataInicio && dataFim) {
+                // Treats inputs as YYYY-MM-DD usually
+                const start = new Date(dataInicio);
+                const end = new Date(dataFim);
+
+                if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+                    throw new Error('Datas inválidas.');
+                }
+
+                // Adjust to cover the full day range in local time (or UTC depending on server/client agreement)
+                // Assuming dataInicio/dataFim are YYYY-MM-DD strings
+
+                // Set start to beginning of the start day (00:00:00)
+                // Note: creating new Date('YYYY-MM-DD') usually creates UTC 00:00
+                // creating new Date(YYYY, MM, DD) creates Local 00:00
+
+                // If the input is YYYY-MM-DD, parsing it directly often results in UTC midnight.
+                // data_entrega is stored as DateTime (Timestamp).
+
+                // We will use a safe range approach.
+                // Start: dataInicio at 00:00:00.000
+                const searchStart = new Date(dataInicio);
+                searchStart.setUTCHours(0, 0, 0, 0); // Force UTC start if input is UTC date string
+
+                // End: dataFim at 23:59:59.999
+                const searchEnd = new Date(dataFim);
+                searchEnd.setUTCHours(23, 59, 59, 999);
+
+                // If the strings are coming from a local date picker, they might be "2024-12-19".
+                // new Date("2024-12-19") -> 2024-12-19T00:00:00.000Z
+
+                // Let's widen slightly if needed, but strict day range is usually preferred.
+                // To be safe against timezone shifts (e.g. if db is stored in UTC but act in -3), 
+                // typically we want to capture the whole absolute time range that covers the day.
+
+                // Let's use the provided strings directly if possible, or stick to simple logic.
+                // Better yet, let's just ensure we capture the full day for the provided dates.
+
+                // Since there was a "hack" before (-1 day), maybe there's a timezone issue.
+                // I'll stick to strict start/end of the day based on the input date values.
+
+                // Fix: reset hours to ensure we get the full day bounds
+                const s = new Date(dataInicio);
+                s.setHours(0, 0, 0, 0);
+
+                const e = new Date(dataFim);
+                e.setHours(23, 59, 59, 999);
+
+                where.data_entrega = {
+                    gte: s,
+                    lte: e
+                };
+                console.log('Filtro de Data Aplicado:', { gte: s, lte: e });
+            }
+
+            const results = await prisma.entregasEPI.findMany({
+                where,
+                include: {
+                    epi: true,
+                    usuario: { select: { nome: true } },
+                    funcionario: {
+                        select: {
+                            nome_completo: true,
+                            cpf: true,
+                            cargo: {
+                                select: { nome_cargo: true }
+                            },
+                            empresa: true
+                        }
+                    }
+                },
+                orderBy: { data_entrega: 'asc' }
+            });
+            console.log('Registros encontrados:', results.length);
+            return results;
+        } catch (error) {
+            console.error('Erro em listarParaRelatorio:', error);
+            throw error;
+        }
+    },
+
     async devolver(id, data_devolucao) {
         return await prisma.entregasEPI.update({
             where: { id },

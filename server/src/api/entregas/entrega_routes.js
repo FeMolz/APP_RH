@@ -8,6 +8,7 @@ router.use(isAuthenticated);
 
 router.get('/', entregaController.listarTodas);
 router.get('/vencidos', entregaController.listarVencidos);
+router.get('/relatorio', entregaController.listarParaRelatorio);
 router.get('/:id', entregaController.listarPorFuncionario);
 router.post('/', entregaController.criar);
 router.put('/:id/devolver', entregaController.devolver);

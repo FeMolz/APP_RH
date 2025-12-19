@@ -42,6 +42,16 @@ export const entregaController = {
         }
     },
 
+    async listarParaRelatorio(req, res, next) {
+        try {
+            const { funcionario_id, data_inicio, data_fim } = req.query;
+            const relatorio = await entregaService.listarParaRelatorio(funcionario_id, data_inicio, data_fim);
+            res.json(relatorio);
+        } catch (error) {
+            next(error);
+        }
+    },
+
     async devolver(req, res, next) {
         try {
             const { id } = req.params;

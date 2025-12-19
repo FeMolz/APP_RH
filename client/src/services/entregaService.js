@@ -14,6 +14,10 @@ export const entregaService = {
         return api.get(`/api/entregas/${id}`, params);
     },
 
+    listarParaRelatorio: async (funcionario_id, data_inicio, data_fim) => {
+        return api.get('/api/entregas/relatorio', { funcionario_id, data_inicio, data_fim });
+    },
+
     criar: async (dados) => {
         return api.post('/api/entregas', dados);
     },

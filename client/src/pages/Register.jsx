@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { FaUser, FaEnvelope, FaLock, FaIdBadge } from 'react-icons/fa';
 import authService from '../services/authService';
 import './Register.css';
 
@@ -43,51 +44,63 @@ const Register = () => {
                 <form onSubmit={handleSubmit}>
                     <div className="form-group">
                         <label htmlFor="nome">Nome</label>
-                        <input
-                            type="text"
-                            id="nome"
-                            name="nome"
-                            value={formData.nome}
-                            onChange={handleChange}
-                            required
-                            placeholder="Seu nome"
-                        />
+                        <div className="input-wrapper">
+                            <FaUser className="input-icon" />
+                            <input
+                                type="text"
+                                id="nome"
+                                name="nome"
+                                value={formData.nome}
+                                onChange={handleChange}
+                                required
+                                placeholder="Seu nome"
+                            />
+                        </div>
                     </div>
                     <div className="form-group">
                         <label htmlFor="email">Email</label>
-                        <input
-                            type="email"
-                            id="email"
-                            name="email"
-                            value={formData.email}
-                            onChange={handleChange}
-                            required
-                            placeholder="seu@email.com"
-                        />
+                        <div className="input-wrapper">
+                            <FaEnvelope className="input-icon" />
+                            <input
+                                type="email"
+                                id="email"
+                                name="email"
+                                value={formData.email}
+                                onChange={handleChange}
+                                required
+                                placeholder="seu@email.com"
+                            />
+                        </div>
                     </div>
                     <div className="form-group">
                         <label htmlFor="senha">Senha</label>
-                        <input
-                            type="password"
-                            id="senha"
-                            name="senha"
-                            value={formData.senha}
-                            onChange={handleChange}
-                            required
-                            placeholder="Sua senha"
-                        />
+                        <div className="input-wrapper">
+                            <FaLock className="input-icon" />
+                            <input
+                                type="password"
+                                id="senha"
+                                name="senha"
+                                value={formData.senha}
+                                onChange={handleChange}
+                                required
+                                placeholder="Sua senha"
+                            />
+                        </div>
                     </div>
                     <div className="form-group">
                         <label htmlFor="role">Tipo de Usuário</label>
-                        <select
-                            id="role"
-                            name="role"
-                            value={formData.role}
-                            onChange={handleChange}
-                        >
-                            <option value="TECNICO">Técnico</option>
-                            <option value="ADMIN">Administrador</option>
-                        </select>
+                        <div className="input-wrapper">
+                            <FaIdBadge className="input-icon" />
+                            <select
+                                id="role"
+                                name="role"
+                                value={formData.role}
+                                onChange={handleChange}
+                            >
+                                <option value="TECNICO">Técnico</option>
+                                <option value="ADMIN">Administrador</option>
+                            </select>
+                        </div>
                     </div>
                     <button type="submit" className="register-btn" disabled={loading}>
                         {loading ? 'Cadastrando...' : 'Cadastrar'}
