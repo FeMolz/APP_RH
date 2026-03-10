@@ -10,8 +10,8 @@ import Historico from '../pages/Historico';
 import Login from '../pages/Login';
 import Register from '../pages/Register';
 import PrivateRoute from '../components/PrivateRoute';
-import RegistroAuditoria from '../pages/RegistroAuditoria';
-import EntregaEPIs from '../pages/EntregaEPIs';
+import CargoEPI from '../pages/CargoEPI';
+import CargoQuesito from '../pages/CargoQuesito';
 
 export default function AppRoutes() {
     return (
@@ -31,12 +31,14 @@ export default function AppRoutes() {
                     <Route path="cadastros/epi" element={<EPIs />} />
                     <Route path="historico" element={<Historico />} />
                     <Route path="historico" element={<Historico />} />
-                    <Route path="entregas" element={<EntregaEPIs />} />
-                    <Route path="registro-epis" element={<RegistroAuditoria />} />
+
                     <Route path="avaliacao" element={<div>Página de Avaliação</div>} />
                     <Route path="pagamentos" element={<div>Página de Pagamentos</div>} />
                     <Route path="docs" element={<div>Página de Documentos</div>} />
                     <Route path="anexos" element={<div>Página de Anexos</div>} />
+
+                    <Route path="vinculos/cargo-epi" element={<CargoEPI />} />
+                    <Route path="vinculos/cargo-quesito" element={<CargoQuesito />} />
                 </Route>
             </Route>
         </Routes>

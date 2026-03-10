@@ -18,7 +18,8 @@ const authService = {
         const data = await response.json();
         if (data.token) {
             localStorage.setItem('token', data.token);
-            localStorage.setItem('user', JSON.stringify(data.user));
+            // O backend retorna 'usuario', precisamos tratar caso venha 'user' também
+            localStorage.setItem('user', JSON.stringify(data.usuario || data.user));
         }
         return data;
     },

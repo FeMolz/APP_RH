@@ -36,7 +36,9 @@ const Historico = () => {
 
     const formatDate = (dateString) => {
         if (!dateString) return '-';
-        return new Date(dateString).toLocaleDateString();
+        const date = new Date(dateString);
+        const localDate = new Date(date.getTime() + date.getTimezoneOffset() * 60000);
+        return localDate.toLocaleDateString();
     };
 
     return (

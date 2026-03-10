@@ -5,10 +5,11 @@ export const quesitoService = {
 
   // POST /quesitos
   criar: async (dados) => {
-    const { descricao_quesito } = dados;
+    const { descricao_quesito, bloco } = dados;
     return await prisma.quesito.create({
       data: {
         descricao_quesito,
+        bloco,
       },
     });
   },
@@ -29,11 +30,12 @@ export const quesitoService = {
 
   // PUT /quesitos/:id 
   atualizar: async (id, dados) => {
-    const { descricao_quesito } = dados;
+    const { descricao_quesito, bloco } = dados;
     return await prisma.quesito.update({
       where: { id: id },
       data: {
         descricao_quesito,
+        bloco,
       },
     });
   },

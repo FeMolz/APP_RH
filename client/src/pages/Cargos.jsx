@@ -1,24 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import cargosService from '../services/cargosService';
+import authService from '../services/authService';
 import './Cargos.css';
-import quesitosService from '../services/quesitosService';
-import { FaSearch, FaPlus, FaBriefcase, FaTimes, FaEdit, FaTrash, FaListUl, FaMinus } from 'react-icons/fa';
+
+import { FaSearch, FaPlus, FaBriefcase, FaTimes, FaEdit, FaTrash } from 'react-icons/fa';
 
 const Cargos = () => {
+    const currentUser = authService.getCurrentUser();
+    const isAdmin = currentUser?.role === 'ADMIN';
+
     const [cargos, setCargos] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
-    const [searchTerm, setSearchTerm] = useState('');
+    const [filters, setFilters] = useState({ nome_cargo: '' });
     const [showModal, setShowModal] = useState(false);
     const [editingId, setEditingId] = useState(null);
 
-    // Quesitos Modal State
-    const [showQuesitosModal, setShowQuesitosModal] = useState(false);
-    const [selectedCargo, setSelectedCargo] = useState(null);
-    const [cargoQuesitos, setCargoQuesitos] = useState([]);
-    const [allQuesitos, setAllQuesitos] = useState([]);
-    const [selectedQuesitoId, setSelectedQuesitoId] = useState('');
-    const [quesitoLoading, setQuesitoLoading] = useState(false);
+
 
     // Form State
     const [formData, setFormData] = useState({
@@ -46,12 +44,15 @@ const Cargos = () => {
         }
     };
 
-    const handleSearch = (e) => {
-        setSearchTerm(e.target.value);
+    const handleFilterChange = (e) => {
+        const { name, value } = e.target;
+        setFilters(prev => ({ ...prev, [name]: value }));
     };
 
+    const uniqueCargos = [...new Set(cargos.map(c => c.nome_cargo).filter(Boolean))].sort();
+
     const filteredCargos = cargos.filter(cargo =>
-        cargo.nome_cargo.toLowerCase().includes(searchTerm.toLowerCase())
+        filters.nome_cargo === '' || cargo.nome_cargo === filters.nome_cargo
     );
 
     const handleInputChange = (e) => {
@@ -100,10 +101,8 @@ const Cargos = () => {
         try {
             if (editingId) {
                 await cargosService.updateCargo(editingId, formData);
-                setFormSuccess('Cargo atualizado com sucesso!');
             } else {
                 await cargosService.createCargo(formData);
-                setFormSuccess('Cargo cadastrado com sucesso!');
             }
 
             if (!editingId) {
@@ -114,11 +113,8 @@ const Cargos = () => {
             }
 
             fetchCargos(); // Refresh list
-            setTimeout(() => {
-                setShowModal(false);
-                setFormSuccess('');
-                setEditingId(null);
-            }, 1500);
+            setShowModal(false);
+            setEditingId(null);
         } catch (err) {
             setFormError(err.message);
         } finally {
@@ -126,69 +122,31 @@ const Cargos = () => {
         }
     };
 
-    const handleManageQuesitos = async (cargo) => {
-        setSelectedCargo(cargo);
-        setShowQuesitosModal(true);
-        setQuesitoLoading(true);
-        try {
-            const [cargoDetails, allQuesitosData] = await Promise.all([
-                cargosService.getCargoById(cargo.id),
-                quesitosService.getQuesitos()
-            ]);
-            setCargoQuesitos(cargoDetails.quesitos || []);
-            setAllQuesitos(allQuesitosData);
-        } catch (err) {
-            alert('Erro ao carregar quesitos: ' + err.message);
-        } finally {
-            setQuesitoLoading(false);
-        }
-    };
 
-    const handleAddQuesito = async () => {
-        if (!selectedQuesitoId) return;
-        try {
-            await cargosService.addQuesitoToCargo(selectedCargo.id, selectedQuesitoId);
-            // Refresh cargo quesitos
-            const updatedCargo = await cargosService.getCargoById(selectedCargo.id);
-            setCargoQuesitos(updatedCargo.quesitos || []);
-            setSelectedQuesitoId('');
-        } catch (err) {
-            alert(err.message);
-        }
-    };
-
-    const handleRemoveQuesito = async (quesitoId) => {
-        try {
-            await cargosService.removeQuesitoFromCargo(selectedCargo.id, quesitoId);
-            // Refresh cargo quesitos
-            const updatedCargo = await cargosService.getCargoById(selectedCargo.id);
-            setCargoQuesitos(updatedCargo.quesitos || []);
-        } catch (err) {
-            alert(err.message);
-        }
-    };
-
-    // Filter out quesitos already added
-    const availableQuesitos = allQuesitos.filter(q =>
-        !cargoQuesitos.some(cq => cq.quesito_id === q.id)
-    );
 
     return (
         <div className="cargos-dashboard">
             <div className="dashboard-header">
-                <div className="search-container">
-                    <FaSearch className="search-icon" />
-                    <input
-                        type="text"
-                        placeholder="Pesquisar cargo..."
-                        value={searchTerm}
-                        onChange={handleSearch}
-                        className="search-input"
-                    />
+                <div className="filters-container">
+                    <div className="filter-group">
+                        <select
+                            name="nome_cargo"
+                            value={filters.nome_cargo}
+                            onChange={handleFilterChange}
+                            className="filter-select primary"
+                        >
+                            <option value="">Todos os Cargos</option>
+                            {uniqueCargos.map((cargo, index) => (
+                                <option key={index} value={cargo}>{cargo}</option>
+                            ))}
+                        </select>
+                    </div>
                 </div>
-                <button className="btn-add" onClick={openNewModal}>
-                    <FaPlus /> Novo Cargo
-                </button>
+                {isAdmin && (
+                    <button className="btn-add" onClick={openNewModal}>
+                        <FaPlus /> Novo Cargo
+                    </button>
+                )}
             </div>
 
             {loading ? (
@@ -202,7 +160,7 @@ const Cargos = () => {
                             <tr>
                                 <th>Nome do Cargo</th>
                                 <th>Descrição</th>
-                                <th>Ações</th>
+                                {isAdmin && <th>Ações</th>}
                             </tr>
                         </thead>
                         <tbody>
@@ -215,24 +173,24 @@ const Cargos = () => {
                                             </div>
                                         </td>
                                         <td>{cargo.descricao || 'Sem descrição'}</td>
-                                        <td>
-                                            <div className="action-buttons">
-                                                <button className="btn-edit-icon" onClick={() => handleManageQuesitos(cargo)} title="Gerenciar Quesitos" style={{ color: '#6f42c1' }}>
-                                                    <FaListUl />
-                                                </button>
-                                                <button className="btn-edit-icon" onClick={() => handleEdit(cargo)} title="Editar">
-                                                    <FaEdit />
-                                                </button>
-                                                <button className="btn-delete-icon" onClick={() => handleDelete(cargo.id)} title="Excluir">
-                                                    <FaTrash />
-                                                </button>
-                                            </div>
-                                        </td>
+                                        {isAdmin && (
+                                            <td>
+                                                <div className="action-buttons">
+
+                                                    <button className="btn-edit-icon" onClick={() => handleEdit(cargo)} title="Editar">
+                                                        <FaEdit />
+                                                    </button>
+                                                    <button className="btn-delete-icon" onClick={() => handleDelete(cargo.id)} title="Excluir">
+                                                        <FaTrash />
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        )}
                                     </tr>
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan="2" className="no-results">Nenhum cargo encontrado.</td>
+                                    <td colSpan={isAdmin ? 3 : 2} className="no-results">Nenhum cargo encontrado.</td>
                                 </tr>
                             )}
                         </tbody>
@@ -282,63 +240,7 @@ const Cargos = () => {
                 </div>
             )}
 
-            {showQuesitosModal && (
-                <div className="modal-overlay">
-                    <div className="modal-content" style={{ maxWidth: '600px' }}>
-                        <button className="modal-close" onClick={() => setShowQuesitosModal(false)}>
-                            <FaTimes />
-                        </button>
-                        <h2>Quesitos - {selectedCargo?.nome_cargo}</h2>
 
-                        <div className="quesitos-manager">
-                            <div className="add-quesito-section">
-                                <select
-                                    value={selectedQuesitoId}
-                                    onChange={(e) => setSelectedQuesitoId(e.target.value)}
-                                    className="quesito-select"
-                                >
-                                    <option value="">Selecione um quesito para adicionar...</option>
-                                    {availableQuesitos.map(q => (
-                                        <option key={q.id} value={q.id}>{q.descricao_quesito}</option>
-                                    ))}
-                                </select>
-                                <button
-                                    className="btn-add-quesito"
-                                    onClick={handleAddQuesito}
-                                    disabled={!selectedQuesitoId}
-                                >
-                                    <FaPlus /> Adicionar
-                                </button>
-                            </div>
-
-                            {quesitoLoading ? (
-                                <div className="loading-small">Carregando...</div>
-                            ) : (
-                                <div className="quesitos-list">
-                                    {cargoQuesitos.length > 0 ? (
-                                        <ul>
-                                            {cargoQuesitos.map(cq => (
-                                                <li key={cq.quesito.id} className="quesito-item">
-                                                    <span>{cq.quesito.descricao_quesito}</span>
-                                                    <button
-                                                        className="btn-remove-quesito"
-                                                        onClick={() => handleRemoveQuesito(cq.quesito.id)}
-                                                        title="Remover"
-                                                    >
-                                                        <FaMinus />
-                                                    </button>
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    ) : (
-                                        <p className="no-quesitos">Nenhum quesito vinculado.</p>
-                                    )}
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                </div>
-            )}
         </div>
     );
 };

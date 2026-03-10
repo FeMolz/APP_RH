@@ -6,16 +6,15 @@ import { isAdmin } from '../../middlewares/isAdmin.js';
 const router = Router();
 
 router.use(isAuthenticated);
-router.use(isAdmin);
 
 router.get('/', epiController.listarTodosAtivos);
 
 router.get('/:id', epiController.buscarPorId);
 
-router.post('/', epiController.criarEpi);
+router.post('/', isAdmin, epiController.criarEpi);
 
-router.put('/:id', epiController.atualizarEpi);
+router.put('/:id', isAdmin, epiController.atualizarEpi);
 
-router.delete('/:id', epiController.inativarEpi);
+router.delete('/:id', isAdmin, epiController.inativarEpi);
 
 export { router as epiRoutes };

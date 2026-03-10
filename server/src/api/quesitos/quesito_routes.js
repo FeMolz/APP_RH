@@ -6,16 +6,15 @@ import { isAdmin } from '../../middlewares/isAdmin.js';
 const router = Router();
 
 router.use(isAuthenticated);
-router.use(isAdmin);
 
 router.get('/', quesitoController.handleListar);
 
 router.get('/:id', quesitoController.handleBuscarPorId);
 
-router.post('/', quesitoController.handleCriar);
+router.post('/', isAdmin, quesitoController.handleCriar);
 
-router.put('/:id', quesitoController.handleAtualizar);
+router.put('/:id', isAdmin, quesitoController.handleAtualizar);
 
-router.delete('/:id', quesitoController.handleDeletar);
+router.delete('/:id', isAdmin, quesitoController.handleDeletar);
 
 export { router as quesitoRoutes };

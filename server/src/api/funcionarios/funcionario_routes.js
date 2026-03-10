@@ -10,7 +10,6 @@ router.get('/birthdays', funcionarioController.listarAniversariantes);
 
 // Rotas protegidas
 router.use(isAuthenticated);
-router.use(isAdmin);
 
 router.get('/', funcionarioController.listarTodosAtivos);
 
@@ -18,13 +17,13 @@ router.get('/inativos', funcionarioController.listarTodosInativos);
 
 router.get('/:id', funcionarioController.buscarPorId);
 
-router.post('/', funcionarioController.criarFuncionario);
+router.post('/', isAdmin, funcionarioController.criarFuncionario);
 
-router.put('/:id', funcionarioController.atualizarFuncionario);
+router.put('/:id', isAdmin, funcionarioController.atualizarFuncionario);
 
 // Desliga um funcionário (Soft Delete)
-router.delete('/:id', funcionarioController.desligarFuncionario);
+router.delete('/:id', isAdmin, funcionarioController.desligarFuncionario);
 
-router.post('/:id/formacao', funcionarioController.adicionarFormacao);
+router.post('/:id/formacao', isAdmin, funcionarioController.adicionarFormacao);
 
 export { router as funcionarioRoutes };

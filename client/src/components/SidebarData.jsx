@@ -1,4 +1,4 @@
-import { FaGraduationCap, FaTools, FaFolder, FaHome, FaUsers, FaBriefcase, FaWallet, FaList, FaSearch, FaHistory } from 'react-icons/fa';
+import { FaGraduationCap, FaTools, FaFolder, FaHome, FaUsers, FaBriefcase, FaWallet, FaList, FaSearch, FaHistory, FaLink } from 'react-icons/fa';
 import { BsFillPersonPlusFill, BsGraphUpArrow } from "react-icons/bs";
 import { IoDocumentText } from "react-icons/io5";
 import { BsClipboard2PulseFill } from "react-icons/bs";
@@ -17,8 +17,16 @@ const SidebarData = [
       { title: 'EPI', path: '/cadastros/epi', icon: FaTools }
     ]
   },
-  { title: 'Entrega EPIs', path: '/entregas', icon: FaTools },
-  { title: 'Registro EPIs', path: '/registro-epis', icon: FaHistory },
+  {
+    title: 'Vínculos',
+    path: '/vinculos',
+    icon: FaLink,
+    subNav: [
+      { title: 'Cargo / EPI', path: '/vinculos/cargo-epi', icon: FaTools },
+      { title: 'Cargo / Quesito', path: '/vinculos/cargo-quesito', icon: FaList }
+    ]
+  },
+
   { title: 'Avaliação', path: '/avaliacao', icon: BsClipboard2PulseFill },
   { title: 'Pagamentos', path: '/pagamentos', icon: FaWallet },
   { title: 'Documentos', path: '/docs', icon: IoDocumentText },

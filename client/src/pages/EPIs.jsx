@@ -1,13 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import episService from '../services/episService';
+import authService from '../services/authService';
 import './EPIs.css';
 import { FaSearch, FaPlus, FaTimes, FaEdit, FaTrash, FaTools } from 'react-icons/fa';
 
 const EPIs = () => {
+    const currentUser = authService.getCurrentUser();
+    const isAdmin = currentUser?.role === 'ADMIN';
+
     const [epis, setEpis] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
-    const [searchTerm, setSearchTerm] = useState('');
+    const [filters, setFilters] = useState({ nome_epi: '', ca_numero: '' });
     const [showModal, setShowModal] = useState(false);
     const [editingId, setEditingId] = useState(null);
 
@@ -39,14 +43,19 @@ const EPIs = () => {
         }
     };
 
-    const handleSearch = (e) => {
-        setSearchTerm(e.target.value);
+    const handleFilterChange = (e) => {
+        const { name, value } = e.target;
+        setFilters(prev => ({ ...prev, [name]: value }));
     };
 
-    const filteredEpis = epis.filter(epi =>
-        epi.nome_epi.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        epi.ca_numero.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const uniqueNomes = [...new Set(epis.map(e => e.nome_epi).filter(Boolean))].sort();
+    const uniqueCAs = [...new Set(epis.map(e => e.ca_numero).filter(Boolean))].sort();
+
+    const filteredEpis = epis.filter(epi => {
+        const matchNome = filters.nome_epi === '' || epi.nome_epi === filters.nome_epi;
+        const matchCA = filters.ca_numero === '' || epi.ca_numero === filters.ca_numero;
+        return matchNome && matchCA;
+    });
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -98,10 +107,8 @@ const EPIs = () => {
         try {
             if (editingId) {
                 await episService.updateEpi(editingId, formData);
-                setFormSuccess('EPI atualizado com sucesso!');
             } else {
                 await episService.createEpi(formData);
-                setFormSuccess('EPI cadastrado com sucesso!');
             }
 
             if (!editingId) {
@@ -114,11 +121,8 @@ const EPIs = () => {
             }
 
             fetchEpis(); // Refresh list
-            setTimeout(() => {
-                setShowModal(false);
-                setFormSuccess('');
-                setEditingId(null);
-            }, 1500);
+            setShowModal(false);
+            setEditingId(null);
         } catch (err) {
             setFormError(err.message);
         } finally {
@@ -128,25 +132,48 @@ const EPIs = () => {
 
     const formatDate = (dateString) => {
         if (!dateString) return '-';
-        return new Date(dateString).toLocaleDateString();
+        const date = new Date(dateString);
+        const localDate = new Date(date.getTime() + date.getTimezoneOffset() * 60000);
+        return localDate.toLocaleDateString();
     };
 
     return (
         <div className="epis-dashboard">
             <div className="dashboard-header">
-                <div className="search-container">
-                    <FaSearch className="search-icon" />
-                    <input
-                        type="text"
-                        placeholder="Pesquisar EPI por nome ou CA..."
-                        value={searchTerm}
-                        onChange={handleSearch}
-                        className="search-input"
-                    />
+                <div className="filters-container">
+                    <div className="filter-group">
+                        <select
+                            name="nome_epi"
+                            value={filters.nome_epi}
+                            onChange={handleFilterChange}
+                            className="filter-select primary"
+                        >
+                            <option value="">Todos os EPIs</option>
+                            {uniqueNomes.map((nome, index) => (
+                                <option key={index} value={nome}>{nome}</option>
+                            ))}
+                        </select>
+                    </div>
+
+                    <div className="filter-group">
+                        <select
+                            name="ca_numero"
+                            value={filters.ca_numero}
+                            onChange={handleFilterChange}
+                            className="filter-select"
+                        >
+                            <option value="">Todos os C.A.</option>
+                            {uniqueCAs.map((ca, index) => (
+                                <option key={index} value={ca}>{ca}</option>
+                            ))}
+                        </select>
+                    </div>
                 </div>
-                <button className="btn-add" onClick={openNewModal}>
-                    <FaPlus /> Novo EPI
-                </button>
+                {isAdmin && (
+                    <button className="btn-add" onClick={openNewModal}>
+                        <FaPlus /> Novo EPI
+                    </button>
+                )}
             </div>
 
             {loading ? (
@@ -162,7 +189,7 @@ const EPIs = () => {
                                 <th>C.A.</th>
                                 <th>Validade C.A.</th>
                                 <th>Descrição</th>
-                                <th>Ações</th>
+                                {isAdmin && <th>Ações</th>}
                             </tr>
                         </thead>
                         <tbody>
@@ -177,21 +204,23 @@ const EPIs = () => {
                                         <td>{epi.ca_numero}</td>
                                         <td>{formatDate(epi.validade_ca)}</td>
                                         <td>{epi.descricao || '-'}</td>
-                                        <td>
-                                            <div className="action-buttons">
-                                                <button className="btn-edit-icon" onClick={() => handleEdit(epi)} title="Editar">
-                                                    <FaEdit />
-                                                </button>
-                                                <button className="btn-delete-icon" onClick={() => handleDelete(epi.id)} title="Excluir">
-                                                    <FaTrash />
-                                                </button>
-                                            </div>
-                                        </td>
+                                        {isAdmin && (
+                                            <td>
+                                                <div className="action-buttons">
+                                                    <button className="btn-edit-icon" onClick={() => handleEdit(epi)} title="Editar">
+                                                        <FaEdit />
+                                                    </button>
+                                                    <button className="btn-delete-icon" onClick={() => handleDelete(epi.id)} title="Excluir">
+                                                        <FaTrash />
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        )}
                                     </tr>
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan="5" className="no-results">Nenhum EPI encontrado.</td>
+                                    <td colSpan={isAdmin ? 5 : 4} className="no-results">Nenhum EPI encontrado.</td>
                                 </tr>
                             )}
                         </tbody>

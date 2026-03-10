@@ -6,7 +6,7 @@ const prisma = new PrismaClient();
 
 export const authService = {
     register: async (dados) => {
-        const { nome, email, senha, role } = dados;
+        const { nome, email, senha } = dados;
 
         const senhaHash = await bcrypt.hash(senha, 10);
 
@@ -15,7 +15,7 @@ export const authService = {
                 nome,
                 email,
                 senha_hash: senhaHash,
-                role,
+                role: 'TECNICO', // Forçando que cadastros via web sejam normais
             },
 
             select: {
@@ -26,7 +26,7 @@ export const authService = {
                 criado_em: true
             }
         });
-        
+
         return novoUsuario;
     },
 

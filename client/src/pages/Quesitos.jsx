@@ -1,19 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import quesitosService from '../services/quesitosService';
+import authService from '../services/authService';
 import './Quesitos.css';
 import { FaSearch, FaPlus, FaTimes, FaEdit, FaTrash, FaListUl } from 'react-icons/fa';
 
 const Quesitos = () => {
+    const currentUser = authService.getCurrentUser();
+    const isAdmin = currentUser?.role === 'ADMIN';
+
     const [quesitos, setQuesitos] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
-    const [searchTerm, setSearchTerm] = useState('');
+    const [filters, setFilters] = useState({ descricao_quesito: '', bloco: '' });
     const [showModal, setShowModal] = useState(false);
     const [editingId, setEditingId] = useState(null);
 
-    // Form State
     const [formData, setFormData] = useState({
-        descricao_quesito: ''
+        descricao_quesito: '',
+        bloco: ''
     });
     const [formLoading, setFormLoading] = useState(false);
     const [formSuccess, setFormSuccess] = useState('');
@@ -36,13 +40,18 @@ const Quesitos = () => {
         }
     };
 
-    const handleSearch = (e) => {
-        setSearchTerm(e.target.value);
+    const handleFilterChange = (e) => {
+        const { name, value } = e.target;
+        setFilters(prev => ({ ...prev, [name]: value }));
     };
 
-    const filteredQuesitos = quesitos.filter(quesito =>
-        quesito.descricao_quesito.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const uniqueDescricoes = [...new Set(quesitos.map(q => q.descricao_quesito).filter(Boolean))].sort();
+
+    const filteredQuesitos = quesitos.filter(quesito => {
+        const matchDescricao = filters.descricao_quesito === '' || quesito.descricao_quesito === filters.descricao_quesito;
+        const matchBloco = filters.bloco === '' || quesito.bloco === filters.bloco;
+        return matchDescricao && matchBloco;
+    });
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -55,7 +64,8 @@ const Quesitos = () => {
     const handleEdit = (quesito) => {
         setEditingId(quesito.id);
         setFormData({
-            descricao_quesito: quesito.descricao_quesito
+            descricao_quesito: quesito.descricao_quesito,
+            bloco: quesito.bloco || ''
         });
         setShowModal(true);
     };
@@ -63,7 +73,8 @@ const Quesitos = () => {
     const openNewModal = () => {
         setEditingId(null);
         setFormData({
-            descricao_quesito: ''
+            descricao_quesito: '',
+            bloco: ''
         });
         setShowModal(true);
     };
@@ -88,24 +99,20 @@ const Quesitos = () => {
         try {
             if (editingId) {
                 await quesitosService.updateQuesito(editingId, formData);
-                setFormSuccess('Quesito atualizado com sucesso!');
             } else {
                 await quesitosService.createQuesito(formData);
-                setFormSuccess('Quesito cadastrado com sucesso!');
             }
 
             if (!editingId) {
                 setFormData({
-                    descricao_quesito: ''
+                    descricao_quesito: '',
+                    bloco: ''
                 });
             }
 
             fetchQuesitos(); // Refresh list
-            setTimeout(() => {
-                setShowModal(false);
-                setFormSuccess('');
-                setEditingId(null);
-            }, 1500);
+            setShowModal(false);
+            setEditingId(null);
         } catch (err) {
             setFormError(err.message);
         } finally {
@@ -116,19 +123,39 @@ const Quesitos = () => {
     return (
         <div className="quesitos-dashboard">
             <div className="dashboard-header">
-                <div className="search-container">
-                    <FaSearch className="search-icon" />
-                    <input
-                        type="text"
-                        placeholder="Pesquisar quesito..."
-                        value={searchTerm}
-                        onChange={handleSearch}
-                        className="search-input"
-                    />
+                <div className="filters-container">
+                    <div className="filter-group">
+                        <select
+                            name="descricao_quesito"
+                            value={filters.descricao_quesito}
+                            onChange={handleFilterChange}
+                            className="filter-select primary"
+                        >
+                            <option value="">Todos os Quesitos</option>
+                            {uniqueDescricoes.map((desc, index) => (
+                                <option key={index} value={desc}>{desc}</option>
+                            ))}
+                        </select>
+                    </div>
+                    <div className="filter-group">
+                        <select
+                            name="bloco"
+                            className="filter-select"
+                            value={filters.bloco}
+                            onChange={handleFilterChange}
+                        >
+                            <option value="">Todos os Blocos</option>
+                            <option value="Responsabilidade e Entrega">Responsabilidade e Entrega</option>
+                            <option value="Competências Comportamentais">Competências Comportamentais</option>
+                            <option value="Competências Técnicas">Competências Técnicas</option>
+                        </select>
+                    </div>
                 </div>
-                <button className="btn-add" onClick={openNewModal}>
-                    <FaPlus /> Novo Quesito
-                </button>
+                {isAdmin && (
+                    <button className="btn-add" onClick={openNewModal}>
+                        <FaPlus /> Novo Quesito
+                    </button>
+                )}
             </div>
 
             {loading ? (
@@ -141,7 +168,8 @@ const Quesitos = () => {
                         <thead>
                             <tr>
                                 <th>Descrição do Quesito</th>
-                                <th>Ações</th>
+                                <th>Bloco</th>
+                                {isAdmin && <th>Ações</th>}
                             </tr>
                         </thead>
                         <tbody>
@@ -155,20 +183,34 @@ const Quesitos = () => {
                                             </div>
                                         </td>
                                         <td>
-                                            <div className="action-buttons">
-                                                <button className="btn-edit-icon" onClick={() => handleEdit(quesito)} title="Editar">
-                                                    <FaEdit />
-                                                </button>
-                                                <button className="btn-delete-icon" onClick={() => handleDelete(quesito.id)} title="Excluir">
-                                                    <FaTrash />
-                                                </button>
-                                            </div>
+                                            <span className="bloco-badge" style={{
+                                                backgroundColor: quesito.bloco ? '#e9ecef' : 'transparent',
+                                                padding: quesito.bloco ? '4px 10px' : '0',
+                                                borderRadius: '12px',
+                                                fontSize: '0.85rem',
+                                                fontWeight: '500',
+                                                color: '#495057'
+                                            }}>
+                                                {quesito.bloco || '-'}
+                                            </span>
                                         </td>
+                                        {isAdmin && (
+                                            <td>
+                                                <div className="action-buttons">
+                                                    <button className="btn-edit-icon" onClick={() => handleEdit(quesito)} title="Editar">
+                                                        <FaEdit />
+                                                    </button>
+                                                    <button className="btn-delete-icon" onClick={() => handleDelete(quesito.id)} title="Excluir">
+                                                        <FaTrash />
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        )}
                                     </tr>
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan="2" className="no-results">Nenhum quesito encontrado.</td>
+                                    <td colSpan={isAdmin ? 3 : 2} className="no-results">Nenhum quesito encontrado.</td>
                                 </tr>
                             )}
                         </tbody>
@@ -198,6 +240,20 @@ const Quesitos = () => {
                                     placeholder="Ex: Conhecimento em React"
                                     rows="3"
                                 />
+                            </div>
+                            <div className="form-group">
+                                <label>Bloco *</label>
+                                <select
+                                    name="bloco"
+                                    value={formData.bloco}
+                                    onChange={handleInputChange}
+                                    required
+                                >
+                                    <option value="">Selecione um bloco</option>
+                                    <option value="Responsabilidade e Entrega">Responsabilidade e Entrega</option>
+                                    <option value="Competências Comportamentais">Competências Comportamentais</option>
+                                    <option value="Competências Técnicas">Competências Técnicas</option>
+                                </select>
                             </div>
 
                             <button type="submit" className="btn-submit" disabled={formLoading}>

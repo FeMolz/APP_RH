@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import funcionariosService from '../services/funcionariosService';
-import cargosService from '../services/cargosService';
+import { FaSearch, FaInfoCircle, FaTimes } from 'react-icons/fa';
 import './EmployeeSearch.css';
-import { FaSearch, FaInfoCircle, FaTimes, FaListUl } from 'react-icons/fa';
 
 const EmployeeSearch = () => {
     const [funcionarios, setFuncionarios] = useState([]);
@@ -11,10 +10,7 @@ const EmployeeSearch = () => {
     const [searchTerm, setSearchTerm] = useState('');
 
     // Quesitos Modal State
-    const [showQuesitosModal, setShowQuesitosModal] = useState(false);
-    const [selectedCargoName, setSelectedCargoName] = useState('');
-    const [cargoQuesitos, setCargoQuesitos] = useState([]);
-    const [quesitoLoading, setQuesitoLoading] = useState(false);
+
 
     useEffect(() => {
         fetchFuncionarios();
@@ -48,19 +44,38 @@ const EmployeeSearch = () => {
         return new Date(dateString).toLocaleDateString();
     };
 
-    const handleViewQuesitos = async (cargoId, cargoName) => {
-        setSelectedCargoName(cargoName);
-        setShowQuesitosModal(true);
-        setQuesitoLoading(true);
-        try {
-            const cargoDetails = await cargosService.getCargoById(cargoId);
-            setCargoQuesitos(cargoDetails.quesitos || []);
-        } catch (err) {
-            alert('Erro ao carregar quesitos: ' + err.message);
-        } finally {
-            setQuesitoLoading(false);
-        }
+    const formatBirthday = (dateString) => {
+        if (!dateString) return '-';
+        const date = new Date(dateString);
+        // Exibir apenas dia e mês para aniversário, considerando o fuso horário utc
+        return new Date(date.getTime() + date.getTimezoneOffset() * 60000).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
     };
+
+    const calculateCompanyAnniversary = (dateString) => {
+        if (!dateString) return '-';
+        const admissao = new Date(dateString);
+        // Ajustando para o timezone local considerando que vem Z do banco
+        const utcDate = new Date(admissao.getTime() + admissao.getTimezoneOffset() * 60000);
+
+        const hoje = new Date();
+        const dataFormatada = utcDate.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+
+        const isAnniversaryMonth = hoje.getMonth() === utcDate.getMonth();
+        const isAnniversaryDay = hoje.getDate() === utcDate.getDate();
+
+        let anos = hoje.getFullYear() - utcDate.getFullYear();
+        if (anos > 0 && isAnniversaryMonth && isAnniversaryDay) {
+            return (
+                <span style={{ color: '#B8860B' }}>
+                    🎉 Completando {anos} {anos === 1 ? 'ano' : 'anos'}
+                </span>
+            );
+        }
+
+        return dataFormatada;
+    };
+
+
 
     return (
         <div className="employee-search-dashboard">
@@ -90,8 +105,8 @@ const EmployeeSearch = () => {
                                 <th>Nome Completo</th>
                                 <th>Cargo</th>
                                 <th>Empresa</th>
-                                <th>Admissão</th>
-                                <th>Formação</th>
+                                <th>Data de Aniversário</th>
+                                <th>Aniversário de Empresa</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -106,31 +121,13 @@ const EmployeeSearch = () => {
                                         <td>
                                             <div className="cargo-cell-content">
                                                 {func.cargo?.nome_cargo || '-'}
-                                                {func.cargo && func.cargo._count?.quesitos > 0 && (
-                                                    <button
-                                                        className="btn-info-icon"
-                                                        onClick={() => handleViewQuesitos(func.cargo.id, func.cargo.nome_cargo)}
-                                                        title="Ver Quesitos"
-                                                    >
-                                                        <FaListUl />
-                                                    </button>
-                                                )}
+
                                             </div>
                                         </td>
                                         <td><span className="empresa-badge">{func.empresa}</span></td>
-                                        <td>{formatDate(func.data_admissao)}</td>
+                                        <td>{formatBirthday(func.data_nascimento)}</td>
                                         <td>
-                                            {func.formacoes && func.formacoes.length > 0 ? (
-                                                <ul className="formacoes-list">
-                                                    {func.formacoes.map(f => (
-                                                        <li key={f.id}>
-                                                            {f.nome_formacao} ({f.nivel})
-                                                        </li>
-                                                    ))}
-                                                </ul>
-                                            ) : (
-                                                <span className="text-muted">-</span>
-                                            )}
+                                            {calculateCompanyAnniversary(func.data_admissao)}
                                         </td>
                                     </tr>
                                 ))
@@ -144,35 +141,7 @@ const EmployeeSearch = () => {
                 </div>
             )}
 
-            {showQuesitosModal && (
-                <div className="modal-overlay">
-                    <div className="modal-content" style={{ maxWidth: '500px' }}>
-                        <button className="modal-close" onClick={() => setShowQuesitosModal(false)}>
-                            <FaTimes />
-                        </button>
-                        <h2>Quesitos - {selectedCargoName}</h2>
 
-                        {quesitoLoading ? (
-                            <div className="loading-small">Carregando...</div>
-                        ) : (
-                            <div className="quesitos-view-list">
-                                {cargoQuesitos.length > 0 ? (
-                                    <ul>
-                                        {cargoQuesitos.map(cq => (
-                                            <li key={cq.quesito.id} className="quesito-view-item">
-                                                <span className="bullet">•</span>
-                                                {cq.quesito.descricao_quesito}
-                                            </li>
-                                        ))}
-                                    </ul>
-                                ) : (
-                                    <p className="no-quesitos">Nenhum quesito vinculado a este cargo.</p>
-                                )}
-                            </div>
-                        )}
-                    </div>
-                </div>
-            )}
         </div>
     );
 };

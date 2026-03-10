@@ -25,14 +25,7 @@ const cargosService = {
         return api.delete(`/api/cargos/${id}`);
     },
 
-    // Quesitos relation
-    addQuesitoToCargo: async (cargoId, quesitoId) => {
-        return api.post(`/api/cargos/${cargoId}/quesito`, { quesito_id: quesitoId });
-    },
 
-    removeQuesitoFromCargo: async (cargoId, quesitoId) => {
-        return api.delete(`/api/cargos/${cargoId}/quesito/${quesitoId}`);
-    }
 };
 
 export default cargosService;

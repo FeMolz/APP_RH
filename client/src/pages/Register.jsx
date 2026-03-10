@@ -87,21 +87,7 @@ const Register = () => {
                             />
                         </div>
                     </div>
-                    <div className="form-group">
-                        <label htmlFor="role">Tipo de Usuário</label>
-                        <div className="input-wrapper">
-                            <FaIdBadge className="input-icon" />
-                            <select
-                                id="role"
-                                name="role"
-                                value={formData.role}
-                                onChange={handleChange}
-                            >
-                                <option value="TECNICO">Técnico</option>
-                                <option value="ADMIN">Administrador</option>
-                            </select>
-                        </div>
-                    </div>
+
                     <button type="submit" className="register-btn" disabled={loading}>
                         {loading ? 'Cadastrando...' : 'Cadastrar'}
                     </button>

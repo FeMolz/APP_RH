@@ -22,7 +22,6 @@ router.post(
 router.get(
   '/',
   isAuthenticated,
-  isAdmin,
   formacaoController.handleListar
 );
 

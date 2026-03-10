@@ -1,19 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import funcionariosService from '../services/funcionariosService';
+import authService from '../services/authService';
 import './Funcionarios.css';
 import { FaSearch, FaPlus, FaUserTie, FaTimes, FaFilter, FaBriefcase, FaEdit, FaTrash } from 'react-icons/fa';
 
 const Funcionarios = () => {
+    const currentUser = authService.getCurrentUser();
+    const isAdmin = currentUser?.role === 'ADMIN';
+
     const [funcionarios, setFuncionarios] = useState([]);
     const [cargos, setCargos] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
-    const [searchTerm, setSearchTerm] = useState('');
     const [showModal, setShowModal] = useState(false);
     const [editingId, setEditingId] = useState(null);
 
     // Filters
     const [filters, setFilters] = useState({
+        nome: '',
         empresa: '',
         cargo_id: ''
     });
@@ -60,10 +64,6 @@ const Funcionarios = () => {
         }
     };
 
-    const handleSearch = (e) => {
-        setSearchTerm(e.target.value);
-    };
-
     const handleFilterChange = (e) => {
         const { name, value } = e.target;
         setFilters(prev => ({
@@ -72,9 +72,14 @@ const Funcionarios = () => {
         }));
     };
 
-    const filteredFuncionarios = funcionarios.filter(func =>
-        func.nome_completo.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const uniqueNomes = [...new Set(funcionarios.map(f => f.nome_completo).filter(Boolean))].sort();
+
+    const filteredFuncionarios = funcionarios.filter(func => {
+        const matchNome = filters.nome === '' || func.nome_completo === filters.nome;
+        const matchEmpresa = filters.empresa === '' || func.empresa === filters.empresa;
+        const matchCargo = filters.cargo_id === '' || func.cargo_id === filters.cargo_id;
+        return matchNome && matchEmpresa && matchCargo;
+    });
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -138,15 +143,12 @@ const Funcionarios = () => {
         e.preventDefault();
         setFormLoading(true);
         setFormError('');
-        setFormSuccess('');
 
         try {
             if (editingId) {
                 await funcionariosService.updateFuncionario(editingId, formData);
-                setFormSuccess('Funcionário atualizado com sucesso!');
             } else {
                 await funcionariosService.createFuncionario(formData);
-                setFormSuccess('Funcionário cadastrado com sucesso!');
             }
 
             if (!editingId) {
@@ -165,11 +167,8 @@ const Funcionarios = () => {
             }
 
             fetchData(); // Refresh list
-            setTimeout(() => {
-                setShowModal(false);
-                setFormSuccess('');
-                setEditingId(null);
-            }, 1500);
+            setShowModal(false);
+            setEditingId(null);
         } catch (err) {
             setFormError(err.message);
         } finally {
@@ -177,23 +176,33 @@ const Funcionarios = () => {
         }
     };
 
+    const formatLocalDate = (dateString) => {
+        if (!dateString) return 'N/A';
+        const date = new Date(dateString);
+        // Adjust for timezone offset to display local date correctly
+        const localDate = new Date(date.getTime() + date.getTimezoneOffset() * 60000);
+        return localDate.toLocaleDateString();
+    };
+
     return (
         <div className="funcionarios-dashboard">
             <div className="dashboard-header">
-                <div className="search-container">
-                    <FaSearch className="search-icon" />
-                    <input
-                        type="text"
-                        placeholder="Pesquisar funcionário..."
-                        value={searchTerm}
-                        onChange={handleSearch}
-                        className="search-input"
-                    />
-                </div>
-
                 <div className="filters-container">
                     <div className="filter-group">
-                        <FaFilter className="filter-icon" />
+                        <select
+                            name="nome"
+                            value={filters.nome}
+                            onChange={handleFilterChange}
+                            className="filter-select primary"
+                        >
+                            <option value="">Todos os Funcionários</option>
+                            {uniqueNomes.map((nome, index) => (
+                                <option key={index} value={nome}>{nome}</option>
+                            ))}
+                        </select>
+                    </div>
+
+                    <div className="filter-group">
                         <select
                             name="empresa"
                             value={filters.empresa}
@@ -207,7 +216,6 @@ const Funcionarios = () => {
                         </select>
                     </div>
                     <div className="filter-group">
-                        <FaBriefcase className="filter-icon" />
                         <select
                             name="cargo_id"
                             value={filters.cargo_id}
@@ -224,9 +232,11 @@ const Funcionarios = () => {
                     </div>
                 </div>
 
-                <button className="btn-add" onClick={openNewModal}>
-                    <FaPlus /> Novo Funcionário
-                </button>
+                {isAdmin && (
+                    <button className="btn-add" onClick={openNewModal}>
+                        <FaPlus /> Novo Funcionário
+                    </button>
+                )}
             </div>
 
             {loading ? (
@@ -242,7 +252,7 @@ const Funcionarios = () => {
                                 <th>Cargo</th>
                                 <th>Empresa</th>
                                 <th>Admissão</th>
-                                <th>Ações</th>
+                                {isAdmin && <th>Ações</th>}
                             </tr>
                         </thead>
                         <tbody>
@@ -256,22 +266,24 @@ const Funcionarios = () => {
                                         </td>
                                         <td>{func.cargo?.nome_cargo || 'Cargo não definido'}</td>
                                         <td><span className="empresa-badge">{func.empresa}</span></td>
-                                        <td>{new Date(func.data_admissao).toLocaleDateString()}</td>
-                                        <td>
-                                            <div className="action-buttons" onClick={(e) => e.stopPropagation()}>
-                                                <button className="btn-edit-icon" onClick={() => handleEdit(func)} title="Editar">
-                                                    <FaEdit />
-                                                </button>
-                                                <button className="btn-delete-icon" onClick={() => handleDelete(func.id)} title="Excluir">
-                                                    <FaTrash />
-                                                </button>
-                                            </div>
-                                        </td>
+                                        <td>{formatLocalDate(func.data_admissao)}</td>
+                                        {isAdmin && (
+                                            <td>
+                                                <div className="action-buttons" onClick={(e) => e.stopPropagation()}>
+                                                    <button className="btn-edit-icon" onClick={() => handleEdit(func)} title="Editar">
+                                                        <FaEdit />
+                                                    </button>
+                                                    <button className="btn-delete-icon" onClick={() => handleDelete(func.id)} title="Excluir">
+                                                        <FaTrash />
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        )}
                                     </tr>
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan="5" className="no-results">Nenhum funcionário encontrado.</td>
+                                    <td colSpan={isAdmin ? 5 : 4} className="no-results">Nenhum funcionário encontrado.</td>
                                 </tr>
                             )}
                         </tbody>
@@ -460,15 +472,15 @@ const Funcionarios = () => {
                             </div>
                             <div className="detail-item">
                                 <strong>Data de Nascimento:</strong>
-                                <span>{selectedFuncionario.data_nascimento ? new Date(selectedFuncionario.data_nascimento).toLocaleDateString() : 'N/A'}</span>
+                                <span>{selectedFuncionario.data_nascimento ? new Date(new Date(selectedFuncionario.data_nascimento).getTime() + new Date(selectedFuncionario.data_nascimento).getTimezoneOffset() * 60000).toLocaleDateString() : 'N/A'}</span>
                             </div>
                             <div className="detail-item">
                                 <strong>Data de Admissão:</strong>
-                                <span>{new Date(selectedFuncionario.data_admissao).toLocaleDateString()}</span>
+                                <span>{selectedFuncionario.data_admissao ? new Date(new Date(selectedFuncionario.data_admissao).getTime() + new Date(selectedFuncionario.data_admissao).getTimezoneOffset() * 60000).toLocaleDateString() : 'N/A'}</span>
                             </div>
                             <div className="detail-item">
                                 <strong>Data Contabilidade:</strong>
-                                <span>{selectedFuncionario.data_contabilidade ? new Date(selectedFuncionario.data_contabilidade).toLocaleDateString() : 'N/A'}</span>
+                                <span>{selectedFuncionario.data_contabilidade ? new Date(new Date(selectedFuncionario.data_contabilidade).getTime() + new Date(selectedFuncionario.data_contabilidade).getTimezoneOffset() * 60000).toLocaleDateString() : 'N/A'}</span>
                             </div>
                         </div>
                     </div>

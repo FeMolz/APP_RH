@@ -1,15 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import formacoesService from '../services/formacoesService';
 import funcionariosService from '../services/funcionariosService';
+import authService from '../services/authService';
 import './Formacoes.css';
 import { FaPlus, FaGraduationCap, FaTimes, FaTrash, FaEdit } from 'react-icons/fa';
 
 const Formacoes = () => {
+    const currentUser = authService.getCurrentUser();
+    const isAdmin = currentUser?.role === 'ADMIN';
+
     const [formacoes, setFormacoes] = useState([]);
     const [funcionarios, setFuncionarios] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [showModal, setShowModal] = useState(false);
+
+    // Filters
+    const [filters, setFilters] = useState({
+        nome: '',
+        formacao: '',
+        instituicao: ''
+    });
 
     // Form State
     const [formData, setFormData] = useState({
@@ -55,6 +66,27 @@ const Formacoes = () => {
         }));
     };
 
+    const handleFilterChange = (e) => {
+        const { name, value } = e.target;
+        setFilters(prev => ({
+            ...prev,
+            [name]: value
+        }));
+    };
+
+    // Extract unique values for filter dropdowns
+    const uniqueNomes = [...new Set(formacoes.map(f => f.funcionario?.nome_completo).filter(Boolean))].sort();
+    const uniqueFormacoes = [...new Set(formacoes.map(f => f.nome_formacao).filter(Boolean))].sort();
+    const uniqueInstituicoes = [...new Set(formacoes.map(f => f.instituicao).filter(Boolean))].sort();
+
+    const filteredFormacoes = formacoes.filter(formacao => {
+        const matchNome = filters.nome === '' || formacao.funcionario?.nome_completo === filters.nome;
+        const matchFormacao = filters.formacao === '' || formacao.nome_formacao === filters.formacao;
+        const matchInstituicao = filters.instituicao === '' || formacao.instituicao === filters.instituicao;
+
+        return matchNome && matchFormacao && matchInstituicao;
+    });
+
     const handleEdit = (formacao) => {
         setEditingId(formacao.id);
         setFormData({
@@ -92,10 +124,8 @@ const Formacoes = () => {
         try {
             if (editingId) {
                 await formacoesService.updateFormacao(editingId, formData);
-                setFormSuccess('Formação atualizada com sucesso!');
             } else {
                 await formacoesService.createFormacao(formData);
-                setFormSuccess('Formação cadastrada com sucesso!');
             }
 
             if (!editingId) {
@@ -111,11 +141,8 @@ const Formacoes = () => {
             }
 
             fetchData(); // Refresh list
-            setTimeout(() => {
-                setShowModal(false);
-                setFormSuccess('');
-                setEditingId(null);
-            }, 1500);
+            setShowModal(false);
+            setEditingId(null);
         } catch (err) {
             setFormError(err.message);
         } finally {
@@ -137,10 +164,55 @@ const Formacoes = () => {
     return (
         <div className="formacoes-dashboard">
             <div className="dashboard-header">
-                <h1>Formações</h1>
-                <button className="btn-add" onClick={openNewModal}>
-                    <FaPlus /> Nova Formação
-                </button>
+                <div className="filters-container">
+                    <div className="filter-group">
+                        <select
+                            name="nome"
+                            value={filters.nome}
+                            onChange={handleFilterChange}
+                            className="filter-select primary"
+                        >
+                            <option value="">Todos os Colaboradores</option>
+                            {uniqueNomes.map((nome, index) => (
+                                <option key={index} value={nome}>{nome}</option>
+                            ))}
+                        </select>
+                    </div>
+
+                    <div className="filter-group">
+                        <select
+                            name="formacao"
+                            value={filters.formacao}
+                            onChange={handleFilterChange}
+                            className="filter-select"
+                        >
+                            <option value="">Todas as Formações</option>
+                            {uniqueFormacoes.map((formacao, index) => (
+                                <option key={index} value={formacao}>{formacao}</option>
+                            ))}
+                        </select>
+                    </div>
+
+                    <div className="filter-group">
+                        <select
+                            name="instituicao"
+                            value={filters.instituicao}
+                            onChange={handleFilterChange}
+                            className="filter-select"
+                        >
+                            <option value="">Todas as Instituições</option>
+                            {uniqueInstituicoes.map((inst, index) => (
+                                <option key={index} value={inst}>{inst}</option>
+                            ))}
+                        </select>
+                    </div>
+                </div>
+
+                {isAdmin && (
+                    <button className="btn-add" onClick={openNewModal}>
+                        <FaPlus /> Nova Formação
+                    </button>
+                )}
             </div>
 
             {loading ? (
@@ -157,14 +229,18 @@ const Formacoes = () => {
                                 <th>Instituição</th>
                                 <th>Nível</th>
                                 <th>Período</th>
-                                <th>Ações</th>
+                                {isAdmin && <th>Ações</th>}
                             </tr>
                         </thead>
                         <tbody>
-                            {formacoes.length > 0 ? (
-                                formacoes.map(formacao => (
+                            {filteredFormacoes.length > 0 ? (
+                                filteredFormacoes.map(formacao => (
                                     <tr key={formacao.id}>
-                                        <td>{formacao.funcionario?.nome_completo}</td>
+                                        <td>
+                                            <div className="user-cell">
+                                                {formacao.funcionario?.nome_completo}
+                                            </div>
+                                        </td>
                                         <td>
                                             <div className="formacao-cell">
                                                 {formacao.nome_formacao}
@@ -173,23 +249,25 @@ const Formacoes = () => {
                                         <td>{formacao.instituicao}</td>
                                         <td><span className="nivel-badge">{formacao.nivel}</span></td>
                                         <td>
-                                            {new Date(formacao.data_inicio).toLocaleDateString()} - {new Date(formacao.data_conclusao).toLocaleDateString()}
+                                            {formacao.data_inicio ? new Date(new Date(formacao.data_inicio).getTime() + new Date(formacao.data_inicio).getTimezoneOffset() * 60000).toLocaleDateString() : ''} - {formacao.data_conclusao ? new Date(new Date(formacao.data_conclusao).getTime() + new Date(formacao.data_conclusao).getTimezoneOffset() * 60000).toLocaleDateString() : ''}
                                         </td>
-                                        <td>
-                                            <div className="action-buttons">
-                                                <button className="btn-edit-icon" onClick={() => handleEdit(formacao)} title="Editar">
-                                                    <FaEdit />
-                                                </button>
-                                                <button className="btn-delete-icon" onClick={() => handleDelete(formacao.id)} title="Excluir">
-                                                    <FaTrash />
-                                                </button>
-                                            </div>
-                                        </td>
+                                        {isAdmin && (
+                                            <td>
+                                                <div className="action-buttons">
+                                                    <button className="btn-edit-icon" onClick={() => handleEdit(formacao)} title="Editar">
+                                                        <FaEdit />
+                                                    </button>
+                                                    <button className="btn-delete-icon" onClick={() => handleDelete(formacao.id)} title="Excluir">
+                                                        <FaTrash />
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        )}
                                     </tr>
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan="6" className="no-results">Nenhuma formação encontrada.</td>
+                                    <td colSpan={isAdmin ? 6 : 5} className="no-results">Nenhuma formação encontrada.</td>
                                 </tr>
                             )}
                         </tbody>
