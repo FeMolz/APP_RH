@@ -82,12 +82,29 @@ const CargoEPI = () => {
     };
 
     const filteredEpis = epis.filter(epi =>
-        filterNome === '' || epi.nome_epi === filterNome
+        filterNome === '' || (epi.nome_epi && epi.nome_epi.toLowerCase().includes(filterNome.toLowerCase()))
     );
 
     if (loading) return <div>Carregando...</div>;
 
     const uniqueEpiNames = [...new Set(epis.map(e => e.nome_epi))].sort();
+
+    const formatDate = (dateString, isento) => {
+        if (isento) return 'Isento';
+        if (!dateString) return 'N/A';
+        const date = new Date(dateString);
+        const localDate = new Date(date.getTime() + date.getTimezoneOffset() * 60000);
+        localDate.setHours(0, 0, 0, 0);
+        
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        if (localDate < today) {
+            return <span style={{ color: 'red', fontWeight: 'bold' }}>VENCIDO</span>;
+        }
+
+        return localDate.toLocaleDateString();
+    };
 
     return (
         <div className="vinculos-dashboard">
@@ -108,16 +125,13 @@ const CargoEPI = () => {
                     </div>
                     {selectedCargo && (
                         <div className="filter-select-container" style={{ minWidth: '250px' }}>
-                            <select
+                            <input
+                                type="text"
                                 value={filterNome}
                                 onChange={handleFilterChange}
-                                className="vinculos-filter-select"
-                            >
-                                <option value="">Todos os EPIs</option>
-                                {uniqueEpiNames.map((nome, index) => (
-                                    <option key={index} value={nome}>{nome}</option>
-                                ))}
-                            </select>
+                                className="vinculos-filter-input"
+                                placeholder="Buscar EPI..."
+                            />
                         </div>
                     )}
                 </div>
@@ -148,8 +162,8 @@ const CargoEPI = () => {
                                                     />
                                                 </td>
                                                 <td>{epi.nome_epi}</td>
-                                                <td>{epi.ca_numero}</td>
-                                                <td>{epi.validade_ca ? new Date(epi.validade_ca).toLocaleDateString() : 'N/A'}</td>
+                                                <td>{epi.isento ? 'Isento' : epi.ca_numero}</td>
+                                                <td>{formatDate(epi.validade_ca, epi.isento)}</td>
                                             </tr>
                                         ))
                                     ) : (

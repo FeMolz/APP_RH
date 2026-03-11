@@ -33,7 +33,9 @@ const Funcionarios = () => {
         data_desligamento: '',
         empresa: '',
         telefone: '',
-        localizacao: ''
+        localizacao: '',
+        setor: '',
+        step: ''
     });
     const [formLoading, setFormLoading] = useState(false);
     const [formSuccess, setFormSuccess] = useState('');
@@ -101,7 +103,9 @@ const Funcionarios = () => {
             data_desligamento: funcionario.data_desligamento ? funcionario.data_desligamento.split('T')[0] : '',
             empresa: funcionario.empresa,
             telefone: funcionario.telefone || '',
-            localizacao: funcionario.localizacao || ''
+            localizacao: funcionario.localizacao || '',
+            setor: funcionario.setor || '',
+            step: funcionario.step || ''
         });
         setShowModal(true);
     };
@@ -118,7 +122,9 @@ const Funcionarios = () => {
             data_desligamento: '',
             empresa: '',
             telefone: '',
-            localizacao: ''
+            localizacao: '',
+            setor: '',
+            step: ''
         });
         setShowModal(true);
     };
@@ -162,7 +168,9 @@ const Funcionarios = () => {
                     data_desligamento: '',
                     empresa: '',
                     telefone: '',
-                    localizacao: ''
+                    localizacao: '',
+                    setor: '',
+                    step: ''
                 });
             }
 
@@ -425,6 +433,50 @@ const Funcionarios = () => {
                                     />
                                 </div>
                             </div>
+                            
+                            <div className="form-row">
+                                <div className="form-group full-width">
+                                    <label>Setor *</label>
+                                    <select
+                                        name="setor"
+                                        value={formData.setor}
+                                        onChange={handleInputChange}
+                                        required
+                                        className="form-control"
+                                    >
+                                        <option value="">Selecione um setor</option>
+                                        <option value="Administrativo">Administrativo</option>
+                                        <option value="Engenharia">Engenharia</option>
+                                        <option value="Obras">Obras</option>
+                                        <option value="Marketing">Marketing</option>
+                                        <option value="Vivant">Vivant</option>
+                                        <option value="Compras">Compras</option>
+                                        <option value="Tecnologia">Tecnologia</option>
+                                        <option value="Limpeza">Limpeza</option>
+                                        <option value="Rio Sports de Areia">Rio Sports de Areia</option>
+                                    </select>
+                                </div>
+                                <div className="form-group full-width">
+                                    <label>Step *</label>
+                                    <select
+                                        name="step"
+                                        value={formData.step}
+                                        onChange={handleInputChange}
+                                        required
+                                        className="form-control"
+                                    >
+                                        <option value="">Selecione um step</option>
+                                        <option value="Trainee">Trainee</option>
+                                        <option value="Junior I">Junior I</option>
+                                        <option value="Junior II">Junior II</option>
+                                        <option value="Junior III">Junior III</option>
+                                        <option value="Pleno I">Pleno I</option>
+                                        <option value="Pleno II">Pleno II</option>
+                                        <option value="Pleno III">Pleno III</option>
+                                        <option value="Senior">Senior</option>
+                                    </select>
+                                </div>
+                            </div>
 
                             <div className="form-actions">
                                 <button type="submit" className="btn-submit" disabled={formLoading}>
@@ -469,6 +521,14 @@ const Funcionarios = () => {
                             <div className="detail-item">
                                 <strong>Localização:</strong>
                                 <span>{selectedFuncionario.localizacao || 'Não informada'}</span>
+                            </div>
+                            <div className="detail-item">
+                                <strong>Setor:</strong>
+                                <span>{selectedFuncionario.setor || 'Não informado'}</span>
+                            </div>
+                            <div className="detail-item">
+                                <strong>Step:</strong>
+                                <span>{selectedFuncionario.step || 'Não informado'}</span>
                             </div>
                             <div className="detail-item">
                                 <strong>Data de Nascimento:</strong>

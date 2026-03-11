@@ -20,7 +20,8 @@ const EPIs = () => {
         nome_epi: '',
         ca_numero: '',
         validade_ca: '',
-        descricao: ''
+        descricao: '',
+        isento: false
     });
     const [formLoading, setFormLoading] = useState(false);
     const [formSuccess, setFormSuccess] = useState('');
@@ -52,8 +53,8 @@ const EPIs = () => {
     const uniqueCAs = [...new Set(epis.map(e => e.ca_numero).filter(Boolean))].sort();
 
     const filteredEpis = epis.filter(epi => {
-        const matchNome = filters.nome_epi === '' || epi.nome_epi === filters.nome_epi;
-        const matchCA = filters.ca_numero === '' || epi.ca_numero === filters.ca_numero;
+        const matchNome = filters.nome_epi === '' || (epi.nome_epi && epi.nome_epi.toLowerCase().includes(filters.nome_epi.toLowerCase()));
+        const matchCA = filters.ca_numero === '' || (epi.ca_numero && String(epi.ca_numero).includes(filters.ca_numero));
         return matchNome && matchCA;
     });
 
@@ -61,7 +62,7 @@ const EPIs = () => {
         const { name, value } = e.target;
         setFormData(prev => ({
             ...prev,
-            [name]: value
+            [name]: e.target.type === 'checkbox' ? e.target.checked : value
         }));
     };
 
@@ -69,9 +70,10 @@ const EPIs = () => {
         setEditingId(epi.id);
         setFormData({
             nome_epi: epi.nome_epi,
-            ca_numero: epi.ca_numero,
+            ca_numero: epi.ca_numero || '',
             validade_ca: epi.validade_ca ? new Date(epi.validade_ca).toISOString().split('T')[0] : '',
-            descricao: epi.descricao || ''
+            descricao: epi.descricao || '',
+            isento: epi.isento || false
         });
         setShowModal(true);
     };
@@ -82,7 +84,8 @@ const EPIs = () => {
             nome_epi: '',
             ca_numero: '',
             validade_ca: '',
-            descricao: ''
+            descricao: '',
+            isento: false
         });
         setShowModal(true);
     };
@@ -116,7 +119,8 @@ const EPIs = () => {
                     nome_epi: '',
                     ca_numero: '',
                     validade_ca: '',
-                    descricao: ''
+                    descricao: '',
+                    isento: false
                 });
             }
 
@@ -130,10 +134,20 @@ const EPIs = () => {
         }
     };
 
-    const formatDate = (dateString) => {
+    const formatDate = (dateString, isento) => {
+        if (isento) return 'Isento';
         if (!dateString) return '-';
         const date = new Date(dateString);
         const localDate = new Date(date.getTime() + date.getTimezoneOffset() * 60000);
+        localDate.setHours(0, 0, 0, 0);
+        
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        if (localDate < today) {
+            return <span style={{ color: 'red', fontWeight: 'bold' }}>VENCIDO</span>;
+        }
+
         return localDate.toLocaleDateString();
     };
 
@@ -142,31 +156,30 @@ const EPIs = () => {
             <div className="dashboard-header">
                 <div className="filters-container">
                     <div className="filter-group">
-                        <select
+                        <input
+                            type="text"
                             name="nome_epi"
                             value={filters.nome_epi}
                             onChange={handleFilterChange}
-                            className="filter-select primary"
-                        >
-                            <option value="">Todos os EPIs</option>
-                            {uniqueNomes.map((nome, index) => (
-                                <option key={index} value={nome}>{nome}</option>
-                            ))}
-                        </select>
+                            className="filter-select primary no-arrow"
+                            placeholder="Buscar EPI..."
+                        />
                     </div>
 
                     <div className="filter-group">
-                        <select
+                        <input
+                            type="text"
                             name="ca_numero"
                             value={filters.ca_numero}
-                            onChange={handleFilterChange}
-                            className="filter-select"
-                        >
-                            <option value="">Todos os C.A.</option>
-                            {uniqueCAs.map((ca, index) => (
-                                <option key={index} value={ca}>{ca}</option>
-                            ))}
-                        </select>
+                            onChange={(e) => {
+                                const val = e.target.value;
+                                if (/^\d*$/.test(val)) {
+                                    handleFilterChange(e);
+                                }
+                            }}
+                            className="filter-select no-arrow"
+                            placeholder="Todos os C.A."
+                        />
                     </div>
                 </div>
                 {isAdmin && (
@@ -201,8 +214,8 @@ const EPIs = () => {
                                                 {epi.nome_epi}
                                             </div>
                                         </td>
-                                        <td>{epi.ca_numero}</td>
-                                        <td>{formatDate(epi.validade_ca)}</td>
+                                        <td>{epi.isento ? 'Isento' : epi.ca_numero}</td>
+                                        <td>{formatDate(epi.validade_ca, epi.isento)}</td>
                                         <td>{epi.descricao || '-'}</td>
                                         {isAdmin && (
                                             <td>
@@ -252,29 +265,45 @@ const EPIs = () => {
                                 />
                             </div>
 
-                            <div className="form-row">
-                                <div className="form-group">
-                                    <label>Número do C.A. *</label>
+                            <div className="form-row" style={{ alignItems: 'center', marginBottom: '15px' }}>
+                                <div className="form-group" style={{ flexDirection: 'row', alignItems: 'center', gap: '10px' }}>
                                     <input
-                                        type="text"
-                                        name="ca_numero"
-                                        value={formData.ca_numero}
+                                        type="checkbox"
+                                        name="isento"
+                                        id="isento"
+                                        checked={formData.isento}
                                         onChange={handleInputChange}
-                                        required
-                                        placeholder="Ex: 12345"
+                                        style={{ width: 'auto', margin: 0 }}
                                     />
-                                </div>
-                                <div className="form-group">
-                                    <label>Validade do C.A. *</label>
-                                    <input
-                                        type="date"
-                                        name="validade_ca"
-                                        value={formData.validade_ca}
-                                        onChange={handleInputChange}
-                                        required
-                                    />
+                                    <label htmlFor="isento" style={{ margin: 0 }}>Isento de C.A.</label>
                                 </div>
                             </div>
+
+                            {!formData.isento && (
+                                <div className="form-row">
+                                    <div className="form-group">
+                                        <label>Número do C.A. *</label>
+                                        <input
+                                            type="text"
+                                            name="ca_numero"
+                                            value={formData.ca_numero}
+                                            onChange={handleInputChange}
+                                            required={!formData.isento}
+                                            placeholder="Ex: 12345"
+                                        />
+                                    </div>
+                                    <div className="form-group">
+                                        <label>Validade do C.A. *</label>
+                                        <input
+                                            type="date"
+                                            name="validade_ca"
+                                            value={formData.validade_ca}
+                                            onChange={handleInputChange}
+                                            required={!formData.isento}
+                                        />
+                                    </div>
+                                </div>
+                            )}
 
                             <div className="form-group">
                                 <label>Descrição</label>

@@ -4,13 +4,14 @@ const prisma = new PrismaClient();
 export const epiService = {
 
   criar: async (dados) => {
-    const { nome_epi, ca_numero, validade_ca, descricao, validade_dias } = dados;
+    const { nome_epi, ca_numero, validade_ca, descricao, validade_dias, isento } = dados;
 
     return await prisma.ePI.create({
       data: {
         nome_epi,
-        ca_numero,
-        validade_ca: new Date(validade_ca),
+        ca_numero: ca_numero || null,
+        validade_ca: validade_ca ? new Date(validade_ca) : null,
+        isento: isento || false,
         descricao,
         validade_dias: validade_dias ? parseInt(validade_dias) : 365,
       },
@@ -31,14 +32,15 @@ export const epiService = {
   },
 
   atualizar: async (id, dados) => {
-    const { nome_epi, ca_numero, validade_ca, descricao, ativo, validade_dias } = dados;
+    const { nome_epi, ca_numero, validade_ca, descricao, ativo, validade_dias, isento } = dados;
 
     return await prisma.ePI.update({
       where: { id: id },
       data: {
         nome_epi,
-        ca_numero,
-        validade_ca: validade_ca ? new Date(validade_ca) : undefined,
+        ca_numero: ca_numero || null,
+        validade_ca: validade_ca ? new Date(validade_ca) : null,
+        isento: isento !== undefined ? isento : undefined,
         descricao,
         validade_dias: validade_dias ? parseInt(validade_dias) : undefined,
         ativo,

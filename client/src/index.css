@@ -39,3 +39,122 @@ textarea {
 main {
   display: block;
 }
+
+/* --- GLOBAL FORM STANDARDIZATION --- */
+/* Inputs & Selects */
+.form-control,
+.vinculos-filter-input,
+.vinculos-filter-select,
+.cargo-select-container select,
+.filter-select,
+.quesito-select,
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="date"],
+select,
+textarea {
+  height: 48px;
+  padding: 10px 15px;
+  border: 1px solid #ced4da;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-family: inherit;
+  color: #495057;
+  background-color: #fff;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+}
+
+textarea {
+  height: auto;
+  min-height: 100px;
+}
+
+.form-control:focus,
+.vinculos-filter-input:focus,
+.vinculos-filter-select:focus,
+.cargo-select-container select:focus,
+.filter-select:focus,
+.quesito-select:focus,
+input:focus:not([type="checkbox"]):not([type="radio"]),
+select:focus,
+textarea:focus {
+  border-color: #17a2b8;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(23, 162, 184, 0.15);
+}
+
+/* Primary Buttons */
+.btn-submit,
+.btn-vincular,
+.btn-add,
+.btn-add-quesito,
+button[type="submit"] {
+  height: 48px;
+  padding: 0 24px;
+  background-color: #17a2b8 !important;
+  color: #fff !important;
+  border: none !important;
+  border-radius: 8px !important;
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-sizing: border-box;
+}
+
+.btn-submit:hover:not(:disabled),
+.btn-vincular:hover:not(:disabled),
+.btn-add:hover:not(:disabled),
+.btn-add-quesito:hover:not(:disabled),
+button[type="submit"]:hover:not(:disabled) {
+  background-color: #138496 !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(19, 132, 150, 0.2);
+}
+
+.btn-submit:disabled,
+.btn-vincular:disabled,
+.btn-add:disabled,
+.btn-add-quesito:disabled,
+button[type="submit"]:disabled {
+  background-color: #a6d5db !important;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Form Groups & Rows */
+.form-row {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+  align-items: flex-start;
+}
+
+.form-group {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 200px;
+}
+
+.form-group.full-width {
+  width: 100%;
+}
+
+.form-group label,
+form label {
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #495057;
+  font-size: 0.95rem;
+}
+/* --- END GLOBAL FORM STANDARDIZATION --- */

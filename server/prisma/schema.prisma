@@ -52,6 +52,8 @@ model Funcionario {
   empresa            String // 'CVF Incorporadora', 'Ligasul', 'Vivant'
   telefone           String?
   localizacao        String?
+  setor              String
+  step               String
   criado_em          DateTime  @default(now())
 
   cargo_id  String     @db.Uuid
@@ -67,8 +69,9 @@ model Funcionario {
 model EPI {
   id            String   @id @default(uuid()) @db.Uuid
   nome_epi      String
-  ca_numero     String
-  validade_ca   DateTime
+  ca_numero     String?
+  validade_ca   DateTime?
+  isento        Boolean  @default(false)
   descricao     String?
   validade_dias Int      @default(365)
   ativo         Boolean  @default(true)
@@ -101,7 +104,7 @@ model Formacao {
 model Quesito {
   id                String  @id @default(uuid()) @db.Uuid
   descricao_quesito String  @unique
-  bloco             String? 
+  bloco             String 
 
   cargos QuesitosEmCargo[]
 

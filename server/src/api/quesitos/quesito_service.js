@@ -6,6 +6,9 @@ export const quesitoService = {
   // POST /quesitos
   criar: async (dados) => {
     const { descricao_quesito, bloco } = dados;
+    if (!bloco) {
+      throw new Error("O campo 'bloco' é obrigatório.");
+    }
     return await prisma.quesito.create({
       data: {
         descricao_quesito,
@@ -31,6 +34,9 @@ export const quesitoService = {
   // PUT /quesitos/:id 
   atualizar: async (id, dados) => {
     const { descricao_quesito, bloco } = dados;
+    if (!bloco) {
+      throw new Error("O campo 'bloco' é obrigatório.");
+    }
     return await prisma.quesito.update({
       where: { id: id },
       data: {

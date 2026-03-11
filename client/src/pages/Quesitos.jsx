@@ -14,6 +14,9 @@ const Quesitos = () => {
     const [filters, setFilters] = useState({ descricao_quesito: '', bloco: '' });
     const [showModal, setShowModal] = useState(false);
     const [editingId, setEditingId] = useState(null);
+    const [viewModal, setViewModal] = useState({ show: false, text: '' });
+
+    const handleViewDescription = (text) => setViewModal({ show: true, text });
 
     const [formData, setFormData] = useState({
         descricao_quesito: '',
@@ -48,7 +51,7 @@ const Quesitos = () => {
     const uniqueDescricoes = [...new Set(quesitos.map(q => q.descricao_quesito).filter(Boolean))].sort();
 
     const filteredQuesitos = quesitos.filter(quesito => {
-        const matchDescricao = filters.descricao_quesito === '' || quesito.descricao_quesito === filters.descricao_quesito;
+        const matchDescricao = filters.descricao_quesito === '' || (quesito.descricao_quesito && quesito.descricao_quesito.toLowerCase().includes(filters.descricao_quesito.toLowerCase()));
         const matchBloco = filters.bloco === '' || quesito.bloco === filters.bloco;
         return matchDescricao && matchBloco;
     });
@@ -125,17 +128,14 @@ const Quesitos = () => {
             <div className="dashboard-header">
                 <div className="filters-container">
                     <div className="filter-group">
-                        <select
+                        <input
+                            type="text"
                             name="descricao_quesito"
                             value={filters.descricao_quesito}
                             onChange={handleFilterChange}
-                            className="filter-select primary"
-                        >
-                            <option value="">Todos os Quesitos</option>
-                            {uniqueDescricoes.map((desc, index) => (
-                                <option key={index} value={desc}>{desc}</option>
-                            ))}
-                        </select>
+                            className="filter-select primary no-arrow"
+                            placeholder="Buscar Quesito..."
+                        />
                     </div>
                     <div className="filter-group">
                         <select
@@ -178,8 +178,13 @@ const Quesitos = () => {
                                     <tr key={quesito.id}>
                                         <td>
                                             <div className="quesito-cell">
-                                                <FaListUl className="quesito-icon" />
-                                                {quesito.descricao_quesito}
+                                                <span 
+                                                    className="quesito-text" 
+                                                    title="Clique para ver a descrição completa"
+                                                    onClick={() => handleViewDescription(quesito.descricao_quesito)}
+                                                >
+                                                    {quesito.descricao_quesito}
+                                                </span>
                                             </div>
                                         </td>
                                         <td>
@@ -189,7 +194,8 @@ const Quesitos = () => {
                                                 borderRadius: '12px',
                                                 fontSize: '0.85rem',
                                                 fontWeight: '500',
-                                                color: '#495057'
+                                                color: '#495057',
+                                                whiteSpace: 'nowrap'
                                             }}>
                                                 {quesito.bloco || '-'}
                                             </span>
@@ -260,6 +266,20 @@ const Quesitos = () => {
                                 {formLoading ? 'Salvando...' : (editingId ? 'Atualizar' : 'Cadastrar')}
                             </button>
                         </form>
+                    </div>
+                </div>
+            )}
+
+            {viewModal.show && (
+                <div className="modal-overlay" onClick={() => setViewModal({ show: false, text: '' })}>
+                    <div className="modal-content" onClick={e => e.stopPropagation()} style={{ maxWidth: '400px', padding: '25px' }}>
+                        <button className="modal-close" onClick={() => setViewModal({ show: false, text: '' })}>
+                            <FaTimes />
+                        </button>
+                        <h3 style={{ marginTop: 0, color: '#2f4050', marginBottom: '15px' }}>Descrição Completa</h3>
+                        <p style={{ lineHeight: '1.5', color: '#495057', fontSize: '1rem', wordBreak: 'break-word', whiteSpace: 'pre-wrap', margin: 0 }}>
+                            {viewModal.text}
+                        </p>
                     </div>
                 </div>
             )}
