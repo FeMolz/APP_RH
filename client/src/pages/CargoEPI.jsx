@@ -145,7 +145,8 @@ const CargoEPI = () => {
                                         <th style={{ width: '50px', textAlign: 'center' }}>Vínculo</th>
                                         <th>Nome do EPI</th>
                                         <th>Número do C.A.</th>
-                                        <th>Validade</th>
+                                        <th>Validade C.A.</th>
+                                        <th>Validade EPI (Dias)</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -164,11 +165,12 @@ const CargoEPI = () => {
                                                 <td>{epi.nome_epi}</td>
                                                 <td>{epi.isento ? 'Isento' : epi.ca_numero}</td>
                                                 <td>{formatDate(epi.validade_ca, epi.isento)}</td>
+                                                <td>{epi.validade_dias} dias</td>
                                             </tr>
                                         ))
                                     ) : (
                                         <tr>
-                                            <td colSpan="4" className="no-results">Nenhum EPI encontrado.</td>
+                                            <td colSpan="5" className="no-results">Nenhum EPI encontrado.</td>
                                         </tr>
                                     )}
                                 </tbody>

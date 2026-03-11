@@ -283,7 +283,6 @@
 .new-funcionario-form {
     display: flex;
     flex-direction: column;
-    gap: 30px;
 }
 
 /* Global form styles are now in index.css */

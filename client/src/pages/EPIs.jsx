@@ -20,6 +20,7 @@ const EPIs = () => {
         nome_epi: '',
         ca_numero: '',
         validade_ca: '',
+        validade_dias: 365,
         descricao: '',
         isento: false
     });
@@ -72,6 +73,7 @@ const EPIs = () => {
             nome_epi: epi.nome_epi,
             ca_numero: epi.ca_numero || '',
             validade_ca: epi.validade_ca ? new Date(epi.validade_ca).toISOString().split('T')[0] : '',
+            validade_dias: epi.validade_dias || 365,
             descricao: epi.descricao || '',
             isento: epi.isento || false
         });
@@ -84,6 +86,7 @@ const EPIs = () => {
             nome_epi: '',
             ca_numero: '',
             validade_ca: '',
+            validade_dias: 365,
             descricao: '',
             isento: false
         });
@@ -119,6 +122,7 @@ const EPIs = () => {
                     nome_epi: '',
                     ca_numero: '',
                     validade_ca: '',
+                    validade_dias: 365,
                     descricao: '',
                     isento: false
                 });
@@ -201,6 +205,7 @@ const EPIs = () => {
                                 <th>Nome do EPI</th>
                                 <th>C.A.</th>
                                 <th>Validade C.A.</th>
+                                <th>Validade EPI (Dias)</th>
                                 <th>Descrição</th>
                                 {isAdmin && <th>Ações</th>}
                             </tr>
@@ -216,6 +221,7 @@ const EPIs = () => {
                                         </td>
                                         <td>{epi.isento ? 'Isento' : epi.ca_numero}</td>
                                         <td>{formatDate(epi.validade_ca, epi.isento)}</td>
+                                        <td>{epi.validade_dias} dias</td>
                                         <td>{epi.descricao || '-'}</td>
                                         {isAdmin && (
                                             <td>
@@ -233,7 +239,7 @@ const EPIs = () => {
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan={isAdmin ? 5 : 4} className="no-results">Nenhum EPI encontrado.</td>
+                                    <td colSpan={isAdmin ? 6 : 5} className="no-results">Nenhum EPI encontrado.</td>
                                 </tr>
                             )}
                         </tbody>
@@ -304,6 +310,26 @@ const EPIs = () => {
                                     </div>
                                 </div>
                             )}
+
+                            <div className="form-row">
+                                <div className="form-group">
+                                    <label>Validade do EPI (Dias) *</label>
+                                    <input
+                                        type="number"
+                                        name="validade_dias"
+                                        value={formData.validade_dias}
+                                        onChange={(e) => {
+                                            const val = e.target.value;
+                                            if (/^\d*$/.test(val)) {
+                                                handleInputChange(e);
+                                            }
+                                        }}
+                                        required
+                                        min="1"
+                                        placeholder="Ex: 365"
+                                    />
+                                </div>
+                            </div>
 
                             <div className="form-group">
                                 <label>Descrição</label>
