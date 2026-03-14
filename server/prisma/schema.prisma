@@ -59,6 +59,7 @@ model Funcionario {
   cargo_id  String     @db.Uuid
   cargo     Cargo      @relation(fields: [cargo_id], references: [id], onDelete: Restrict)
   formacoes Formacao[]
+  entregas_epi EntregaEPI[]
 
 
 
@@ -78,6 +79,7 @@ model EPI {
   criado_em     DateTime @default(now())
 
   cargos        EPIsEmCargo[]
+  entregas      EntregaEPI[]
 
   @@map("epis")
 }
@@ -133,4 +135,20 @@ model EPIsEmCargo {
 
   @@id([cargo_id, epi_id])
   @@map("cargos_epis")
+}
+
+// Histórico de Entregas de EPIs aos Funcionários
+model EntregaEPI {
+  id              String   @id @default(uuid()) @db.Uuid
+  data_entrega    DateTime @db.Date
+  data_vencimento DateTime @db.Date
+  criado_em       DateTime @default(now())
+
+  funcionario_id  String   @db.Uuid
+  epi_id          String   @db.Uuid
+
+  funcionario     Funcionario @relation(fields: [funcionario_id], references: [id], onDelete: Cascade)
+  epi             EPI         @relation(fields: [epi_id], references: [id], onDelete: Restrict)
+
+  @@map("entregas_epi")
 }

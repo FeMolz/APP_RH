@@ -69,26 +69,29 @@ export const funcionarioService = {
 
   listarAniversariantes: async () => {
     const currentDate = new Date();
-    const currentMonth = currentDate.getMonth() + 1; // JavaScript months são 0-based
+    const currentDay = currentDate.getDate();
+    const currentMonth = currentDate.getMonth() + 1;
 
-    return await prisma.funcionario.findMany({
+    // Buscar todos os funcionarios ativos
+    const funcionarios = await prisma.funcionario.findMany({
       where: {
-        ativo: true,
-        data_nascimento: {
-          not: null
-        }
+        ativo: true
       },
       select: {
         id: true,
         nome_completo: true,
-        data_nascimento: true
-      },
-      orderBy: [
-        {
-          data_nascimento: 'asc'
-        }
-      ]
+        data_admissao: true,
+        empresa: true,
+        setor: true
+      }
     });
+
+    // Filtrar localmente por dia e mês de admissão (aniversário de empresa)
+    // Usar getUTCDate() e getUTCMonth() para evitar problemas com timezone de datas salvas no DB como YYYY-MM-DDT00:00:00Z
+    return funcionarios.filter(f => {
+      const admissao = new Date(f.data_admissao);
+      return admissao.getUTCDate() === currentDay && (admissao.getUTCMonth() + 1) === currentMonth;
+    }).sort((a, b) => new Date(a.data_admissao) - new Date(b.data_admissao));
   },
 
   buscarPorId: async (id) => {

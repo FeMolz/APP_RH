@@ -141,9 +141,12 @@ const EPIs = () => {
     const formatDate = (dateString, isento) => {
         if (isento) return 'Isento';
         if (!dateString) return '-';
-        const date = new Date(dateString);
-        const localDate = new Date(date.getTime() + date.getTimezoneOffset() * 60000);
-        localDate.setHours(0, 0, 0, 0);
+        
+        // As datas vêm do banco no formato ISO (ex: 2024-12-31T00:00:00.000Z).
+        // Para comparar dias indepedente de fuso horário, usamos a comparação de YYYY-MM-DD local vs UTC.
+        
+        const dateStrOnly = dateString.split('T')[0]; // "2024-12-31"
+        const localDate = new Date(dateStrOnly + 'T00:00:00'); // Força a data local exatamente as 00:00 do dia escolhido
         
         const today = new Date();
         today.setHours(0, 0, 0, 0);

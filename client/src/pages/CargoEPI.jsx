@@ -92,9 +92,9 @@ const CargoEPI = () => {
     const formatDate = (dateString, isento) => {
         if (isento) return 'Isento';
         if (!dateString) return 'N/A';
-        const date = new Date(dateString);
-        const localDate = new Date(date.getTime() + date.getTimezoneOffset() * 60000);
-        localDate.setHours(0, 0, 0, 0);
+        
+        const dateStrOnly = dateString.split('T')[0];
+        const localDate = new Date(dateStrOnly + 'T00:00:00'); 
         
         const today = new Date();
         today.setHours(0, 0, 0, 0);

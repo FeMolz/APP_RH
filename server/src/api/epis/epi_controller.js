@@ -17,6 +17,7 @@ export const epiController = {
   async listarTodosAtivos(req, res, next) {
     try {
       const epis = await epiService.listarAtivos();
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
       res.status(200).json(epis);
     } catch (error) {
       next(error);

@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://localhost:3001';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001';
 
 const getAuthHeaders = () => {
     const token = localStorage.getItem('token');
@@ -36,7 +36,9 @@ export const api = {
         const url = `${API_BASE_URL}${endpoint}${queryParams ? `?${queryParams}` : ''}`;
 
         const response = await fetch(url, {
+            method: 'GET',
             headers: getAuthHeaders(),
+            cache: 'no-store',
             ...options
         });
 

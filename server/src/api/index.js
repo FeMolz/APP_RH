@@ -6,6 +6,7 @@ import { epiRoutes } from './epis/epi_routes.js';
 import { formacaoRoutes } from './formacoes/formacao_routes.js';
 import { quesitoRoutes } from './quesitos/quesito_routes.js';
 import { vinculosRoutes } from './vinculos/vinculos_routes.js';
+import { entregasEpiRoutes } from './entregas_epi/entrega_epi_routes.js';
 
 const router = express.Router();
 
@@ -16,5 +17,6 @@ router.use('/epis', epiRoutes);
 router.use('/formacoes', formacaoRoutes);
 router.use('/quesitos', quesitoRoutes);
 router.use('/vinculos', vinculosRoutes);
+router.use('/entregas-epi', entregasEpiRoutes);
 
 export default router;
