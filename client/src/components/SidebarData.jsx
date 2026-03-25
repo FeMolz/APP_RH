@@ -27,6 +27,7 @@ const SidebarData = [
     ]
   },
   { title: 'Entrega EPIs', path: '/entrega-epi', icon: FaHardHat },
+  { title: 'Relatórios', path: '/relatorios', icon: IoDocumentText },
   { title: 'Avaliação', path: '/avaliacao', icon: BsClipboard2PulseFill },
   { title: 'Pagamentos', path: '/pagamentos', icon: FaWallet },
   { title: 'Documentos', path: '/docs', icon: IoDocumentText },

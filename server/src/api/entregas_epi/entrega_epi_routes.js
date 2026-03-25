@@ -9,6 +9,7 @@ router.use(isAuthenticated);
 
 // Acesso à tela e visualização das peendencias restritos aos Admins (Técnicos de Segurança/RH)
 router.get('/pendentes', isAdmin, entregaEpiController.listarPendentes);
+router.get('/relatorio', isAdmin, entregaEpiController.gerarRelatorio);
 router.post('/', isAdmin, entregaEpiController.registrarEntrega);
 
 export { router as entregasEpiRoutes };

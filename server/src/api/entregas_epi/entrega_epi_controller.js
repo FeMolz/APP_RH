@@ -19,6 +19,26 @@ export const entregaEpiController = {
     } catch (error) {
       next(error);
     }
+  },
+
+  async gerarRelatorio(req, res, next) {
+    try {
+      const { funcionario_id, data_inicio, data_fim } = req.query;
+      
+      if (!funcionario_id || !data_inicio || !data_fim) {
+        return res.status(400).json({ error: "Parâmetros funcionario_id, data_inicio e data_fim são obrigatórios." });
+      }
+
+      const entregas = await entregaEpiService.buscarEntregasPorPeriodo(
+        funcionario_id,
+        data_inicio,
+        data_fim
+      );
+      
+      res.status(200).json(entregas);
+    } catch (error) {
+      next(error);
+    }
   }
 
 };

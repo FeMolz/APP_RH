@@ -4,6 +4,15 @@
   margin: 0 auto;
 }
 
+.page-title {
+  margin-top: 0;
+  margin-bottom: 25px;
+  font-size: 1.5rem;
+  color: #2f4050;
+  display: flex;
+  align-items: center;
+}
+
 .filter-panel {
   background: white;
   border-radius: 8px;
@@ -63,51 +72,69 @@
   overflow-x: auto;
 }
 
-.delivery-table {
+.data-table {
   width: 100%;
   border-collapse: collapse;
 }
 
-.delivery-table th {
+.data-table th,
+.data-table td {
+  padding: 12px 20px;
   text-align: left;
-  padding: 12px 15px;
-  background-color: #f8fafc;
-  color: #475569;
-  font-weight: 600;
-  border-bottom: 2px solid #e2e8f0;
+  border-bottom: 1px solid #e9ecef;
 }
 
-.delivery-table td {
-  padding: 15px;
-  border-bottom: 1px solid #e2e8f0;
-  vertical-align: middle;
+.data-table th {
+  background-color: #f8f9fa;
+  color: #495057;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  letter-spacing: 0.5px;
+}
+
+.data-table tr:last-child td {
+  border-bottom: none;
+}
+
+.data-table tr:hover {
+  background-color: #f8f9fa;
+}
+
+.user-cell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 600;
+  color: #2f4050;
 }
 
 .funcionario-info strong {
   display: block;
-  font-size: 1.05rem;
-  color: #1e293b;
+  font-size: 1rem;
+  color: #2f4050;
   margin-bottom: 4px;
 }
 
 .cargo-tag-small {
   display: inline-block;
-  background: #f1f5f9;
-  color: #64748b;
-  padding: 2px 6px;
-  border-radius: 4px;
-  font-size: 0.75rem;
+  background-color: #e9ecef;
+  color: #495057;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 500;
 }
 
 .epi-info strong {
   display: block;
-  color: #334155;
+  color: #2f4050;
   margin-bottom: 4px;
 }
 
 .info-detail {
-  font-size: 0.8rem;
-  color: #64748b;
+  font-size: 0.85rem;
+  color: #6c757d;
 }
 
 .status-badge {
@@ -138,10 +165,6 @@
   border: 1px solid #6ee7b7;
 }
 
-.status-row:hover {
-  background-color: #f1f5f9 !important;
-}
-
 .btn-entregar {
   color: white;
   border: none;
@@ -156,11 +179,13 @@
 }
 
 .btn-entregar.primary {
-  background: #3b82f6; /* Azul padrão */
+  background: #17a2b8; /* Cor padrão do sistema */
 }
 
 .btn-entregar.primary:hover:not(:disabled) {
-  background: #2563eb;
+  background: #138496;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(19, 132, 150, 0.2);
 }
 
 .btn-entregar.secondary {

@@ -120,7 +120,7 @@ const EntregaEPIs = () => {
 
     return (
         <div className="entrega-dashboard">
-            <h1 className="page-title"><FaHardHat style={{marginRight: '10px'}}/> Gestão de Entrega de EPIs</h1>
+
 
             <div className="filter-panel">
                 <div className="panel-header-search">
@@ -160,7 +160,7 @@ const EntregaEPIs = () => {
             ) : (
                 <div className="details-panel slide-in">
                     <div className="table-responsive">
-                        <table className="delivery-table">
+                        <table className="data-table">
                             <thead>
                                 <tr>
                                     <th>Status</th>
@@ -179,9 +179,11 @@ const EntregaEPIs = () => {
                                             </span>
                                         </td>
                                         <td>
-                                            <div className="funcionario-info">
-                                                <strong>{row.nome_completo}</strong>
-                                                <span className="cargo-tag-small">{row.cargo_nome}</span>
+                                            <div className="user-cell">
+                                                <div className="funcionario-info">
+                                                    <strong>{row.nome_completo}</strong>
+                                                    <span className="empresa-badge">{row.cargo_nome}</span>
+                                                </div>
                                             </div>
                                         </td>
                                         <td>

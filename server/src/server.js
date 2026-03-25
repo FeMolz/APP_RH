@@ -15,7 +15,7 @@ const PORT = 3001;
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutos
-  max: 100, // Limite de 100 requisições por IP a cada 15 minutos
+  max: process.env.NODE_ENV === 'production' ? 100 : 1000, // Limite de 100 em prod, 1000 em dev
   message: 'Muitas requisições deste IP, tente novamente mais tarde.'
 });
 

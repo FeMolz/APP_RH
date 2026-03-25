@@ -62,3 +62,9 @@
 }
 
 /* Global form styles are now in index.css */
+
+.vinculos-actions {
+    margin-top: 25px;
+    display: flex;
+    justify-content: flex-end;
+}

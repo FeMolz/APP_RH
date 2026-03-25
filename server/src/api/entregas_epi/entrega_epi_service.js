@@ -110,5 +110,33 @@ export const entregaEpiService = {
     });
 
     return novaEntrega;
+  },
+
+  buscarEntregasPorPeriodo: async (funcionario_id, data_inicio, data_fim) => {
+    const inicio = new Date(`${data_inicio}T00:00:00.000Z`);
+    const fim = new Date(`${data_fim}T23:59:59.999Z`);
+
+    const entregas = await prisma.entregaEPI.findMany({
+      where: {
+        funcionario_id: funcionario_id,
+        data_entrega: {
+          gte: inicio,
+          lte: fim
+        }
+      },
+      include: {
+        epi: true,
+        funcionario: {
+          include: {
+            cargo: true
+          }
+        }
+      },
+      orderBy: {
+        data_entrega: 'desc'
+      }
+    });
+
+    return entregas;
   }
 };

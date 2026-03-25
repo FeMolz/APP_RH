@@ -13,6 +13,7 @@ import PrivateRoute from '../components/PrivateRoute';
 import CargoEPI from '../pages/CargoEPI';
 import CargoQuesito from '../pages/CargoQuesito';
 import EntregaEPIs from '../pages/EntregaEPIs';
+import Relatorios from '../pages/Relatorios';
 
 export default function AppRoutes() {
     return (
@@ -31,6 +32,7 @@ export default function AppRoutes() {
                     <Route path="cadastros/quesito" element={<Quesitos />} />
                     <Route path="cadastros/epi" element={<EPIs />} />
                     <Route path="entrega-epi" element={<EntregaEPIs />} />
+                    <Route path="relatorios" element={<Relatorios />} />
                     <Route path="historico" element={<Historico />} />
                     <Route path="historico" element={<Historico />} />
 
